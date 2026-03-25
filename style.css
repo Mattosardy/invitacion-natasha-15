@@ -1,0 +1,463 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Courier New', monospace;
+    background: #0a0508;
+    min-height: 100vh;
+    padding: 15px;
+    position: relative;
+}
+
+/* Fondo con textura */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle at 20% 30%, rgba(233,69,96,0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.container {
+    max-width: 550px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.invitation-card {
+    background: linear-gradient(135deg, #0f0a0c 0%, #1a1217 100%);
+    border-radius: 30px;
+    padding: 25px 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(233,69,96,0.3);
+}
+
+/* Fuegos artificiales */
+.firework-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.firework {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #e94560, #ffd700);
+    animation: firework 2s ease-out infinite;
+}
+
+.firework:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+.firework:nth-child(2) { top: 80%; left: 85%; animation-delay: 1s; }
+.firework:nth-child(3) { top: 50%; left: 50%; animation-delay: 0.5s; }
+
+@keyframes firework {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(30); opacity: 0; }
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Título */
+.title-section {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.metal-band {
+    font-size: 0.7em;
+    letter-spacing: 2px;
+    color: #e94560;
+    margin-bottom: 5px;
+}
+
+.title {
+    font-size: 2.2em;
+    color: #e94560;
+    text-shadow: 0 0 8px rgba(233,69,96,0.5);
+    letter-spacing: 2px;
+}
+
+/* Marco para foto o video */
+.photo-frame {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e94560, #8b0000);
+    padding: 4px;
+    box-shadow: 0 0 25px rgba(233,69,96,0.5);
+}
+
+.photo-glow {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(233,69,96,0.2), transparent 70%);
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.03); }
+}
+
+/* Estilo tanto para foto como para video */
+.profile-photo, .profile-video {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #1a0a0a;
+}
+
+/* Detalles del evento - formato compacto */
+.event-details {
+    background: rgba(0,0,0,0.5);
+    border-radius: 20px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.detail-chip {
+    background: rgba(233,69,96,0.15);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    color: #e0e0e0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.detail-chip.location {
+    background: rgba(233,69,96,0.25);
+}
+
+.detail-chip.address {
+    font-size: 0.75em;
+    background: rgba(0,0,0,0.5);
+}
+
+.detail-row.highlight .detail-chip {
+    background: #e94560;
+    color: #fff;
+    font-weight: bold;
+}
+
+.map-btn {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    padding: 8px;
+    background: linear-gradient(135deg, #e94560, #8b0000);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 0.8em;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.map-btn:hover {
+    transform: scale(1.02);
+}
+
+/* Dress code y Regalo en la misma línea */
+.info-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.dress-code, .gift-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(20, 15, 18, 0.9);
+    border-radius: 15px;
+    padding: 10px 12px;
+    min-width: 140px;
+}
+
+.info-icon {
+    font-size: 1.4em;
+}
+
+.info-text {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75em;
+    color: #e0e0e0;
+}
+
+.info-text strong {
+    color: #e94560;
+    font-size: 0.85em;
+}
+
+.dress-code .info-text .note {
+    font-size: 0.65em;
+    color: #e94560;
+}
+
+.account-number {
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #ffd966;
+    font-weight: bold;
+    background: rgba(0,0,0,0.3);
+    padding: 2px 6px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+/* Sección de confirmación */
+.guest-section {
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(233,69,96,0.5);
+    border-radius: 30px;
+    font-size: 0.9em;
+    color: #fff;
+    text-align: center;
+    font-family: monospace;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #e94560;
+    box-shadow: 0 0 8px rgba(233,69,96,0.3);
+}
+
+.confirm-btn {
+    background: linear-gradient(135deg, #e94560, #8b0000);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    font-size: 0.9em;
+    border-radius: 40px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    margin-top: 12px;
+    transition: all 0.3s;
+}
+
+.confirm-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(233,69,96,0.4);
+}
+
+.confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Mensajes */
+.message {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    display: none;
+    text-align: center;
+    font-size: 0.8em;
+}
+
+.message.success {
+    background: rgba(0,100,0,0.3);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    display: block;
+}
+
+.message.error {
+    background: rgba(233,69,96,0.2);
+    border: 1px solid #e94560;
+    color: #e94560;
+    display: block;
+}
+
+/* Lista de confirmados compacta */
+.confirmed-guests {
+    background: rgba(0,0,0,0.4);
+    border-radius: 15px;
+    padding: 12px;
+    margin-bottom: 20px;
+}
+
+.confirmed-guests h3 {
+    color: #e94560;
+    text-align: center;
+    font-size: 0.8em;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.confirmed-guests ul {
+    list-style: none;
+    max-height: 120px;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+
+.confirmed-guests li {
+    background: rgba(233,69,96,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7em;
+    color: #e0e0e0;
+    display: inline-block;
+}
+
+/* Cuenta regresiva al pie */
+.countdown {
+    background: linear-gradient(135deg, rgba(233,69,96,0.2), rgba(0,0,0,0.6));
+    border-radius: 20px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid rgba(233,69,96,0.3);
+}
+
+.countdown-timer {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.time-box {
+    text-align: center;
+    background: rgba(0,0,0,0.5);
+    padding: 6px;
+    border-radius: 12px;
+    flex: 1;
+}
+
+.time-box span:first-child {
+    font-size: 1.3em;
+    font-weight: bold;
+    display: block;
+    color: #e94560;
+    font-family: monospace;
+}
+
+.time-box span:last-child {
+    font-size: 0.6em;
+    color: #c9c9c9;
+}
+
+.deadline-note {
+    font-size: 0.65em;
+    color: #ffaa00;
+    background: rgba(0,0,0,0.4);
+    padding: 5px;
+    border-radius: 8px;
+}
+
+/* Control de música */
+.music-control {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    z-index: 1000;
+}
+
+.music-btn {
+    background: rgba(0,0,0,0.8);
+    color: #e94560;
+    border: 1px solid #e94560;
+    padding: 8px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.8em;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.music-btn:hover {
+    background: #e94560;
+    color: #000;
+}
+
+/* Responsive para móviles */
+@media (max-width: 480px) {
+    .container {
+        max-width: 100%;
+    }
+    
+    .invitation-card {
+        padding: 20px 15px;
+    }
+    
+    .title {
+        font-size: 1.8em;
+    }
+    
+    .photo-frame {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .dress-code, .gift-section {
+        width: 100%;
+    }
+    
+    .detail-chip {
+        font-size: 0.7em;
+    }
+    
+    .time-box span:first-child {
+        font-size: 1.1em;
+    }
+}
