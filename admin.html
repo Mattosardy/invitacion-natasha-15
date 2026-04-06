@@ -131,6 +131,20 @@
             color: #e94560;
             font-weight: bold;
         }
+        .send-invite-btn {
+            background: #25D366;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        .send-invite-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 8px rgba(37,211,102,0.5);
+        }
         .export-btn {
             width: 100%;
             padding: 12px;
@@ -141,22 +155,6 @@
             margin-top: 20px;
             cursor: pointer;
             font-weight: bold;
-        }
-        .whatsapp-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #25D366, #128C7E);
-            color: #fff;
-            border: none;
-            border-radius: 30px;
-            margin-top: 15px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1em;
-        }
-        .whatsapp-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(37,211,102,0.5);
         }
         .reset-btn {
             width: 100%;
@@ -186,6 +184,7 @@
             th, td { font-size: 0.7em; padding: 8px; }
             .form-agregar { flex-direction: column; }
             .stats { flex-direction: column; }
+            .send-invite-btn { padding: 4px 8px; font-size: 0.6em; }
         }
     </style>
 </head>
@@ -236,14 +235,13 @@
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
-                        <tr><th>Nombre</th><th>Teléfono</th><th>Estado</th></tr>
+                        <tr><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Acción</th></tr>
                     </thead>
                     <tbody id="invitadosList"></tbody>
                 </table>
             </div>
 
             <button class="export-btn" id="exportBtn">📥 Exportar lista a Excel</button>
-            <button class="whatsapp-btn" id="whatsappDiffusionBtn">📱 CREAR LISTA DE DIFUSIÓN EN WHATSAPP</button>
             <button class="reset-btn" id="resetBtn">🔄 RESTABLECER LISTA COMPLETA</button>
         </div>
     </div>
@@ -322,6 +320,14 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados));
         }
 
+        function enviarInvitacionPorWhatsApp(index) {
+            const invitado = listaInvitados[index];
+            const nombreCodificado = encodeURIComponent(invitado.nombre);
+            const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0aTe invito a celebrar mis 15 años.%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0ahttps://mattosardy.github.io/invitacion-natasha-15/?nombre=${nombreCodificado}%0a%0a¡Te esperamos! 🎉`;
+            const url = `https://wa.me/${invitado.telefono}?text=${mensaje}`;
+            window.open(url, '_blank');
+        }
+
         function actualizarTabla() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const filtrados = listaInvitados.filter(i => 
@@ -331,19 +337,26 @@
 
             const tbody = document.getElementById('invitadosList');
             if (filtrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">No hay invitados</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No hay invitados</tr</tr>';
             } else {
-                tbody.innerHTML = filtrados.map((inv) => {
+                tbody.innerHTML = filtrados.map((inv, idx) => {
+                    const originalIndex = listaInvitados.findIndex(i => i === inv);
                     const fecha = inv.fechaConfirmacion ? new Date(inv.fechaConfirmacion).toLocaleString() : '-';
                     const personasExtras = inv.cantidad - 1;
                     const mostrarNombre = personasExtras > 0 ? `${inv.nombre} +${personasExtras}` : inv.nombre;
+                    const estadoTexto = inv.confirmado ? '✅ CONFIRMADO' : '⏳ PENDIENTE';
+                    const estadoClase = inv.confirmado ? 'confirmado' : 'pendiente';
+                    
                     return `
                         <tr>
                             <td>${mostrarNombre} <span class="cantidad-badge">${inv.cantidad} pers</span></td>
                             <td>${inv.telefono}</td>
-                            <td class="${inv.confirmado ? 'confirmado' : 'pendiente'}">
-                                ${inv.confirmado ? '✅ CONFIRMADO' : '⏳ PENDIENTE'}
+                            <td class="${estadoClase}">
+                                ${estadoTexto}
                                 ${inv.confirmado ? `<br><small>${fecha}</small>` : ''}
+                            </td>
+                            <td>
+                                ${!inv.confirmado ? `<button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})">📲 Enviar invitación</button>` : '—'}
                             </td>
                         </tr>
                     `;
@@ -425,42 +438,9 @@
             }
         }
 
-        function crearListaDifusion() {
-            const numeros = listaInvitados
-                .map(inv => inv.telefono)
-                .filter(tel => tel && tel.length >= 8)
-                .map(tel => {
-                    let limpio = tel.replace(/[^0-9]/g, '');
-                    if (limpio.length === 9 && !limpio.startsWith('598')) {
-                        limpio = '598' + limpio;
-                    }
-                    return limpio;
-                });
-            
-            if (numeros.length === 0) {
-                alert('No hay números de teléfono válidos en la lista');
-                return;
-            }
-            
-            const confirmar = confirm(`📱 Se abrirán ${numeros.length} contactos de WhatsApp.\n\n⚠️ IMPORTANTE:\n- Se abrirán varias pestañas\n- Debés agregar CADA contacto a la lista de difusión\n\n¿Continuar?`);
-            
-            if (!confirmar) return;
-            
-            for (let i = 0; i < numeros.length; i++) {
-                setTimeout(() => {
-                    window.open(`https://wa.me/${numeros[i]}`, '_blank');
-                }, i * 400);
-            }
-            
-            setTimeout(() => {
-                alert(`✅ Se abrieron ${numeros.length} contactos.\n\n📌 CÓMO CREAR LA LISTA DE DIFUSIÓN:\n1. En WhatsApp, toca MENÚ → NUEVA LISTA DE DIFUSIÓN\n2. Agregá los contactos que se abrieron\n3. ¡Listo!`);
-            }, numeros.length * 400 + 1000);
-        }
-
         document.getElementById('agregarBtn').addEventListener('click', agregarInvitado);
         document.getElementById('searchInput').addEventListener('input', actualizarTabla);
         document.getElementById('exportBtn').addEventListener('click', exportarExcel);
-        document.getElementById('whatsappDiffusionBtn').addEventListener('click', crearListaDifusion);
         document.getElementById('resetBtn').addEventListener('click', restablecerLista);
         
         cargarLista();
