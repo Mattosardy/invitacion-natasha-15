@@ -21,14 +21,40 @@ function obtenerNombreDeURL() {
     return nombre ? decodeURIComponent(nombre) : null;
 }
 
-// ============================================
-// VERIFICAR QUE EL NOMBRE ESTÉ EN LA LISTA DEL ADMIN
-// ============================================
 function verificarNombreEnLista(nombre) {
     const listaCompleta = localStorage.getItem('listaInvitadosNatasha');
     if (listaCompleta) {
         const invitadosAdmin = JSON.parse(listaCompleta);
-        return invitadosAdmin.some(i => i.nombre.toLowerCase() === nombre.toLowerCase());
+        
+        // Función para normalizar (eliminar tildes, espacios, etc.)
+        function normalizar(texto) {
+            return texto
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, '')  // eliminar espacios
+                .replace(/-/g, '');   // eliminar guiones
+        }
+        
+        // También crear versión simplificada (solo primera palabra)
+        function simplificar(texto) {
+            // Tomar solo la primera parte antes de " y " o " +"
+            let simple = texto.split(' y ')[0];
+            simple = simple.split(' +')[0];
+            return normalizar(simple);
+        }
+        
+        const nombreNormalizado = normalizar(nombre);
+        const nombreSimplificado = simplificar(nombre);
+        
+        return invitadosAdmin.some(i => {
+            const nombreListaNormalizado = normalizar(i.nombre);
+            const nombreListaSimplificado = simplificar(i.nombre);
+            
+            return nombreListaNormalizado === nombreNormalizado ||
+                   nombreListaSimplificado === nombreSimplificado ||
+                   nombreListaNormalizado.includes(nombreNormalizado) ||
+                   nombreSimplificado === nombreNormalizado;
+        });
     }
     return false;
 }
