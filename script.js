@@ -9,6 +9,7 @@ const SHEETDB_URL = "https://sheetdb.io/api/v1/csd1vhl35hj05";
 const confirmBtn = document.getElementById('confirmBtn');
 const guestNameInput = document.getElementById('guestName');
 const guestNameDisplay = document.getElementById('guestNameDisplay');
+const guestListElement = document.getElementById('guestList');
 const messageDiv = document.getElementById('message');
 const accesoBanner = document.getElementById('accesoInvalidoBanner');
 
@@ -29,12 +30,28 @@ function obtenerNombreDeURL() {
 // ============================================
 async function verificarNombreEnSheetDB(nombre) {
     try {
-        const response = await fetch(`${SHEETDB_URL}/search?nombre=${encodeURIComponent(nombre)}`);
+        const response = await fetch(SHEETDB_URL);
         const data = await response.json();
-        return data && data.length > 0;
+        
+        function normalizar(texto) {
+            return texto
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .trim()
+                .replace(/\s+/g, ' ');
+        }
+        
+        const nombreNormalizado = normalizar(nombre);
+        
+        const encontrado = data.find(inv => {
+            const nombreSheet = normalizar(inv.nombre || "");
+            return nombreSheet === nombreNormalizado;
+        });
+        
+        return encontrado || null;
     } catch (error) {
         console.error('Error verificando en SheetDB:', error);
-        return false;
+        return null;
     }
 }
 
@@ -43,12 +60,10 @@ async function verificarNombreEnSheetDB(nombre) {
 // ============================================
 async function guardarConfirmacionEnSheetDB(nombre) {
     try {
-        // Primero buscar si ya existe
         const searchResponse = await fetch(`${SHEETDB_URL}/search?nombre=${encodeURIComponent(nombre)}`);
         const existing = await searchResponse.json();
         
         if (existing && existing.length > 0) {
-            // Actualizar existente
             await fetch(`${SHEETDB_URL}/nombre/${encodeURIComponent(nombre)}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -58,7 +73,6 @@ async function guardarConfirmacionEnSheetDB(nombre) {
                 })
             });
         } else {
-            // Crear nuevo registro
             await fetch(SHEETDB_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -95,6 +109,7 @@ function mostrarMensaje(texto, tipo) {
 // ACTUALIZAR LISTA LOCAL
 // ============================================
 function actualizarListaLocal() {
+    if (!guestListElement) return;
     if (invitados.length === 0) {
         guestListElement.innerHTML = '<li style="text-align: center;">✨ Aún no hay confirmaciones ✨</li>';
         return;
@@ -131,34 +146,51 @@ async function confirmarAsistencia() {
         return;
     }
     
-    // Verificar si ya confirmó localmente
     const yaConfirmoLocal = invitados.some(invitado => invitado.nombre.toLowerCase() === nombreInvitado.toLowerCase());
     if (yaConfirmoLocal) {
         mostrarMensaje('✅ Ya confirmaste tu asistencia. ¡Te esperamos!', 'error');
         return;
     }
     
-    // Verificar en SheetDB si ya confirmó
-    const existeEnSheetDB = await verificarNombreEnSheetDB(nombreInvitado);
-    if (!existeEnSheetDB) {
-        mostrarMensaje('❌ Lo sentimos, tu nombre no está en la lista de invitados.', 'error');
-        return;
-    }
+    mostrarMensaje('🔄 Verificando en la base de datos...', 'success');
     
-    // Guardar confirmación en SheetDB
-    const guardado = await guardarConfirmacionEnSheetDB(nombreInvitado);
-    
-    if (guardado) {
-        // Guardar también en localStorage local
-        invitados.push({
-            nombre: nombreInvitado,
-            fecha: new Date().toISOString()
+    try {
+        const invitadoEnDB = await verificarNombreEnSheetDB(nombreInvitado);
+        
+        if (!invitadoEnDB) {
+            mostrarMensaje('❌ Lo sentimos, tu nombre no está en la lista de invitados.', 'error');
+            return;
+        }
+        
+        if (invitadoEnDB.confirmado === "SI") {
+            mostrarMensaje('✅ Ya confirmaste tu asistencia anteriormente. ¡Te esperamos!', 'error');
+            return;
+        }
+        
+        const updateResponse = await fetch(`${SHEETDB_URL}/nombre/${encodeURIComponent(invitadoEnDB.nombre)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                confirmado: "SI",
+                fecha_confirmacion: new Date().toISOString()
+            })
         });
-        localStorage.setItem('invitadosFiesta', JSON.stringify(invitados));
-        mostrarMensaje(`🎉 ¡Gracias ${nombreInvitado}! Has confirmado tu asistencia. ¡Te esperamos! 🎉`, 'success');
-        confirmBtn.disabled = true;
-    } else {
-        mostrarMensaje('❌ Error al guardar la confirmación. Intentá de nuevo.', 'error');
+        
+        if (updateResponse.ok) {
+            invitados.push({
+                nombre: nombreInvitado,
+                fecha: new Date().toISOString()
+            });
+            localStorage.setItem('invitadosFiesta', JSON.stringify(invitados));
+            mostrarMensaje(`🎉 ¡Gracias ${nombreInvitado}! Has confirmado tu asistencia. ¡Te esperamos! 🎉`, 'success');
+            confirmBtn.disabled = true;
+        } else {
+            mostrarMensaje('❌ Error al guardar la confirmación. Intentá de nuevo.', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error general:', error);
+        mostrarMensaje('❌ Error de conexión. Revisá tu internet y volvé a intentar.', 'error');
     }
 }
 
@@ -255,13 +287,13 @@ function init() {
         guestNameDisplay.textContent = `🎸 ${nombreInvitado} 🎸`;
         guestNameInput.value = nombreInvitado;
         habilitarBoton();
-        accesoBanner.style.display = 'none';
+        if (accesoBanner) accesoBanner.style.display = 'none';
     } else {
         guestNameDisplay.textContent = '⚠️ Acceso no válido';
         guestNameDisplay.style.color = '#e94560';
         guestNameDisplay.style.borderColor = '#e94560';
         confirmBtn.disabled = true;
-        accesoBanner.style.display = 'block';
+        if (accesoBanner) accesoBanner.style.display = 'block';
         mostrarMensaje('❌ Acceso no válido. Usá el enlace que recibiste por WhatsApp.', 'error');
     }
     
@@ -272,7 +304,7 @@ function init() {
 // ============================================
 // EVENTOS
 // ============================================
-confirmBtn.addEventListener('click', confirmarAsistencia);
+if (confirmBtn) confirmBtn.addEventListener('click', confirmarAsistencia);
 if (botonMusica) botonMusica.addEventListener('click', controlarMusica);
 
 // Iniciar
