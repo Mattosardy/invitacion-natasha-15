@@ -1,114 +1,122 @@
 // ============================================
 // INVITACIÓN 15 AÑOS - NATASHA
-// Fecha del evento: 13 de Junio, 2026 - 22:00 hs
-// Fecha límite: 29 de Mayo, 2026 (15 días antes)
+// Versión pulida con banner de acceso inválido
 // ============================================
 
-// 1. Seleccionar elementos del HTML
 const confirmBtn = document.getElementById('confirmBtn');
 const guestNameInput = document.getElementById('guestName');
-const guestListElement = document.getElementById('guestList');
+const guestNameDisplay = document.getElementById('guestNameDisplay');
 const messageDiv = document.getElementById('message');
+const accesoBanner = document.getElementById('accesoInvalidoBanner');
 
-// 2. Array para guardar los invitados
 let invitados = [];
+let nombreInvitado = null;
 
-// 3. Función para mostrar mensajes
+// ============================================
+// LEER NOMBRE DE LA URL
+// ============================================
+function obtenerNombreDeURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const nombre = urlParams.get('nombre');
+    return nombre ? decodeURIComponent(nombre) : null;
+}
+
+// ============================================
+// VERIFICAR QUE EL NOMBRE ESTÉ EN LA LISTA DEL ADMIN
+// ============================================
+function verificarNombreEnLista(nombre) {
+    const listaCompleta = localStorage.getItem('listaInvitadosNatasha');
+    if (listaCompleta) {
+        const invitadosAdmin = JSON.parse(listaCompleta);
+        return invitadosAdmin.some(i => i.nombre.toLowerCase() === nombre.toLowerCase());
+    }
+    return false;
+}
+
+// ============================================
+// MOSTRAR MENSAJES
+// ============================================
 function mostrarMensaje(texto, tipo) {
     messageDiv.textContent = texto;
     messageDiv.className = `message ${tipo}`;
-    
     setTimeout(() => {
         messageDiv.className = 'message';
     }, 4000);
 }
 
-// 4. Función para actualizar la lista de invitados
-function actualizarLista() {
-    if (invitados.length === 0) {
-        guestListElement.innerHTML = '<li style="text-align: center;">✨ Aún no hay confirmaciones ✨</li>';
-        return;
-    }
-    
-    let html = '';
-    for (let i = 0; i < invitados.length; i++) {
-        html += `<li>✅ ${invitados[i].nombre}</li>`;
-    }
-    guestListElement.innerHTML = html;
-}
-
-// 5. Función para verificar fecha límite (15 días antes = 29 de Mayo 2026)
+// ============================================
+// VERIFICAR FECHA LÍMITE
+// ============================================
 function verificarFechaLimite() {
     const fechaLimite = new Date('2026-05-29T23:59:59');
     const ahora = new Date();
-    
     if (ahora > fechaLimite) {
         confirmBtn.disabled = true;
-        mostrarMensaje('⏰ El plazo de confirmación finalizó el 29 de Mayo. ¡Gracias por tu interés!', 'error');
+        mostrarMensaje('⏰ El plazo de confirmación finalizó el 29 de Mayo', 'error');
         return true;
     }
     return false;
 }
 
-// 6. Función para confirmar asistencia
+// ============================================
+// CONFIRMAR ASISTENCIA
+// ============================================
 function confirmarAsistencia() {
-    if (verificarFechaLimite()) {
+    if (verificarFechaLimite()) return;
+    
+    if (!nombreInvitado) {
+        mostrarMensaje('❌ Acceso no válido. Usá el enlace que recibiste por WhatsApp.', 'error');
         return;
     }
     
-    const nombre = guestNameInput.value.trim();
-    
-    if (nombre === '') {
-        mostrarMensaje('Por favor, ingresa tu nombre completo', 'error');
-        return;
+    // Cargar lista actualizada de confirmados
+    const guardados = localStorage.getItem('invitadosFiesta');
+    if (guardados) {
+        invitados = JSON.parse(guardados);
     }
     
-    const yaConfirmo = invitados.some(invitado => invitado.nombre.toLowerCase() === nombre.toLowerCase());
-    
+    // Verificar si ya confirmó antes
+    const yaConfirmo = invitados.some(invitado => invitado.nombre.toLowerCase() === nombreInvitado.toLowerCase());
     if (yaConfirmo) {
-        mostrarMensaje('Ya confirmaste tu asistencia anteriormente. ¡Te esperamos!', 'error');
+        mostrarMensaje('✅ Ya confirmaste tu asistencia. ¡Te esperamos!', 'error');
         return;
     }
     
+    // Verificar que el nombre esté en la lista de invitados del admin
+    const nombreValido = verificarNombreEnLista(nombreInvitado);
+    
+    if (!nombreValido) {
+        mostrarMensaje('❌ Lo sentimos, tu nombre no está en la lista de invitados. Por favor contactá a Natasha.', 'error');
+        return;
+    }
+    
+    // Guardar confirmación
     invitados.push({
-        nombre: nombre,
+        nombre: nombreInvitado,
         fecha: new Date().toISOString()
     });
     
     localStorage.setItem('invitadosFiesta', JSON.stringify(invitados));
-    guestNameInput.value = '';
-    actualizarLista();
-    mostrarMensaje(`🎉 ¡Gracias ${nombre}! Has confirmado tu asistencia. ¡Te esperamos el 13 de Junio! 🎉`, 'success');
+    mostrarMensaje(`🎉 ¡Gracias ${nombreInvitado}! Has confirmado tu asistencia. ¡Te esperamos! 🎉`, 'success');
     confirmBtn.disabled = true;
 }
 
-// 7. Función para habilitar/deshabilitar botón según input
-function verificarInput() {
+// ============================================
+// HABILITAR BOTÓN
+// ============================================
+function habilitarBoton() {
     const fechaLimite = new Date('2026-05-29T23:59:59');
     const ahora = new Date();
-    
     if (ahora > fechaLimite) {
         confirmBtn.disabled = true;
         return;
     }
-    
-    if (guestNameInput.value.trim() !== '') {
-        confirmBtn.disabled = false;
-    } else {
-        confirmBtn.disabled = true;
-    }
+    confirmBtn.disabled = false;
 }
 
-// 8. Cargar invitados guardados al iniciar
-function cargarInvitadosGuardados() {
-    const guardados = localStorage.getItem('invitadosFiesta');
-    if (guardados) {
-        invitados = JSON.parse(guardados);
-        actualizarLista();
-    }
-}
-
-// 9. CUENTA REGRESIVA
+// ============================================
+// CUENTA REGRESIVA
+// ============================================
 function actualizarCuentaRegresiva() {
     const fechaEvento = new Date('2026-06-13T22:00:00');
     const ahora = new Date();
@@ -133,7 +141,9 @@ function actualizarCuentaRegresiva() {
     document.getElementById('seconds').textContent = segundos.toString().padStart(2, '0');
 }
 
-// 10. CONTROL DE MÚSICA
+// ============================================
+// CONTROL DE MÚSICA
+// ============================================
 let musicaActiva = false;
 const musica = document.getElementById('bgMusic');
 const botonMusica = document.getElementById('musicToggle');
@@ -143,31 +153,47 @@ function controlarMusica() {
         musica.pause();
         botonMusica.textContent = '🎵 Activar Música';
         musicaActiva = false;
-        console.log('Música pausada');
     } else {
         musica.play().then(() => {
-            console.log('Música reproduciéndose');
             botonMusica.textContent = '🔇 Silenciar';
             musicaActiva = true;
-        }).catch(error => {
-            console.log('Error al reproducir:', error);
-            mostrarMensaje('🎵 Haz clic en la página para activar la música', 'error');
-            botonMusica.textContent = '🎵 Activar Música';
+        }).catch(() => {
+            mostrarMensaje('🎵 Haz clic para activar la música', 'error');
         });
     }
 }
 
-// 11. CONFIGURAR EVENTOS
+// ============================================
+// INICIALIZAR
+// ============================================
+function init() {
+    nombreInvitado = obtenerNombreDeURL();
+    
+    if (nombreInvitado) {
+        guestNameDisplay.textContent = `🎸 ${nombreInvitado} 🎸`;
+        guestNameInput.value = nombreInvitado;
+        habilitarBoton();
+        accesoBanner.style.display = 'none';
+    } else {
+        guestNameDisplay.textContent = '⚠️ Acceso no válido';
+        guestNameDisplay.style.color = '#e94560';
+        guestNameDisplay.style.borderColor = '#e94560';
+        confirmBtn.disabled = true;
+        accesoBanner.style.display = 'block';
+        mostrarMensaje('❌ Acceso no válido. Usá el enlace que recibiste por WhatsApp.', 'error');
+    }
+    
+    actualizarCuentaRegresiva();
+    setInterval(actualizarCuentaRegresiva, 1000);
+}
+
+// ============================================
+// EVENTOS
+// ============================================
 confirmBtn.addEventListener('click', confirmarAsistencia);
-guestNameInput.addEventListener('input', verificarInput);
-botonMusica.addEventListener('click', controlarMusica);
+if (botonMusica) botonMusica.addEventListener('click', controlarMusica);
 
-// 12. INICIAR TODO
-cargarInvitadosGuardados();
-actualizarCuentaRegresiva();
-setInterval(actualizarCuentaRegresiva, 1000);
+// INICIAR
+init();
 
-console.log('✅ Invitación de Natasha - 15 Años - App iniciada correctamente!');
-console.log('📅 Evento: 13 de Junio 2026 - 22:00 hs');
-console.log('⚠️ Fecha límite de confirmación: 29 de Mayo 2026');
-console.log('🎵 Música: archivo local musica-natasha.mp3');
+console.log('✅ Invitación lista - Versión pulida');

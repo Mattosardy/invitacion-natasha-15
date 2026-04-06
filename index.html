@@ -4,158 +4,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     
-    <!-- Título que se ve en la pestaña del navegador -->
-    <title>🎸 Natasha - 15 Años | Confirmá tu asistencia 🎸</title>
+    <title>🦇 Natasha - 15 Años | Ceremonia Gótica 🦇</title>
     
-    <!-- ========================================== -->
-    <!-- META TAGS PARA WHATSAPP Y REDES SOCIALES -->
-    <!-- ========================================== -->
-    
-    <!-- Meta tags básicas -->
-    <meta name="description" content="🎉 ¡Estás invitado a los 15 años de Natasha! Fecha: 13 de Junio 2026. Lugar: Nuevo Salón Azul. Confirmá tu asistencia antes del 29 de Mayo. ¡Te esperamos!">
-    <meta name="author" content="Natasha">
-    <meta name="keywords" content="fiesta, 15 años, cumpleaños, Natasha, invitación, Montevideo">
-    
-    <!-- Open Graph (para WhatsApp, Facebook, etc.) -->
-    <meta property="og:title" content="🎸 Natasha - 15 Años | Confirmá tu asistencia 🎸">
-    <meta property="og:description" content="🎉 ¡Estás invitado a los 15 años de Natasha! 📅 Sábado 13 de Junio 2026 - 22:00 hs 📍 Nuevo Salón Azul, José Belloni 3342 👗 Código: Negro (solo para la quinceañera) ✅ Confirmación obligatoria antes del 29 de Mayo">
+    <meta name="description" content="🦇 Celebración gótica de los 15 años de Natasha. 13 de Junio 2026 - Nuevo Salón Azul">
+    <meta property="og:title" content="🦇 Natasha - 15 Años | Ceremonia Gótica">
+    <meta property="og:description" content="Celebración gótica de los 15 años de Natasha. 13 de Junio 2026 - Nuevo Salón Azul">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mattosardy.github.io/invitacion-natasha-15/">
     <meta property="og:image" content="https://mattosardy.github.io/invitacion-natasha-15/vista-previa.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:locale" content="es_ES">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="🎸 Natasha - 15 Años | Confirmá tu asistencia">
-    <meta name="twitter:description" content="¡Estás invitado a los 15 años de Natasha! Confirmá tu asistencia antes del 29 de Mayo.">
-    <meta name="twitter:image" content="https://mattosardy.github.io/invitacion-natasha-15/vista-previa.jpg">
-    
-    <!-- Meta para que WhatsApp no cachee la imagen vieja -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- BANNER DE ACCESO NO VÁLIDO -->
+    <div id="accesoInvalidoBanner" class="banner-acceso-invalido" style="display: none;">
+        ⚠️ ACCESO NO VÁLIDO ⚠️<br>
+        Usá el enlace que recibiste por WhatsApp.
+    </div>
+
     <div class="container">
         <div class="invitation-card">
-            <!-- Fuegos artificiales decorativos -->
-            <div class="firework-animation">
-                <div class="firework"></div>
-                <div class="firework"></div>
-                <div class="firework"></div>
+            
+            <!-- VIDEO DE FONDO -->
+            <div class="bg-video-container">
+                <video id="bgVideo" class="bg-video" autoplay loop muted playsinline>
+                    <source src="foto-natasha.mp4" type="video/mp4">
+                </video>
             </div>
             
+            <!-- Elementos decorativos góticos -->
+            <div class="gothic-border top"></div>
+            <div class="gothic-border bottom"></div>
+            <div class="gothic-corner tl"></div>
+            <div class="gothic-corner tr"></div>
+            <div class="gothic-corner bl"></div>
+            <div class="gothic-corner br"></div>
+            
             <div class="content">
-                <!-- Título arriba de la foto -->
+                <!-- TÍTULO -->
                 <div class="title-section">
+                    <div class="gothic-cross">†</div>
                     <div class="metal-band">✦ MIS 15 AÑOS ✦</div>
                     <h1 class="title">NATASHA</h1>
+                <div class="gothic-cross bottom">†</div>
                 </div>
 
-                <!-- VIDEO CENTRAL -->
-                <div class="photo-frame">
-                    <div class="photo-glow"></div>
-                    <video id="birthdayVideo" class="profile-video" autoplay loop muted playsinline>
-                        <source src="foto-natasha.mp4" type="video/mp4">
-                        Tu navegador no soporta videos
-                    </video>
-                </div>
+                <!-- ESPACIO VACÍO CENTRAL (VIDEO PROTAGONISTA) -->
+                <div class="empty-space"></div>
 
-                <!-- DATOS EN LINEAS COMPACTAS -->
-                <div class="event-details">
-                    <div class="detail-row">
-                        <span class="detail-chip">📅 Sábado 13 Junio 2026</span>
-                        <span class="detail-chip">🕗 22:00 a 05:00</span>
-                    </div>
-                    
-                    <div class="detail-row">
-                        <span class="detail-chip location">📍 Nuevo Salón Azul</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-chip address">José Belloni 3342, Montevideo</span>
-                    </div>
-                    
-                    <div class="detail-row highlight">
-                        <span class="detail-chip">⏰ ¡Se puntual por favor!</span>
-                    </div>
-                    
-                    <a href="https://maps.app.goo.gl/LX1qvkwKApb9qiAA6" target="_blank" class="map-btn">
-                        🗺️ Ver ubicación en Google Maps
-                    </a>
-                </div>
-
-                <!-- Dress code y Regalo -->
-                <div class="info-row">
-                    <div class="dress-code">
-                        <span class="info-icon">👗</span>
-                        <div class="info-text">
-                            <strong>Código:</strong> Negro
-                            <span class="note">(solo para la quinceañera)</span>
+                <!-- SECCIÓN UNIFICADA: botón + nombre + cuenta regresiva -->
+                <div class="action-section">
+                    <div class="unified-box">
+                        <div class="unified-row">
+                            <button id="confirmBtn" class="confirm-btn" disabled>
+                                🦇 CONFIRMAR
+                            </button>
+                            <div class="nombre-invitado-linea">
+                                <div id="guestNameDisplay" class="nombre-automatico-linea">🎸 Cargando...</div>
+                                <input type="hidden" id="guestName" readonly>
+                            </div>
+                            <div class="countdown-numbers">
+                                <div class="countdown-timer">
+                                    <div class="time-box">
+                                        <span id="days">00</span>
+                                        <span>d</span>
+                                    </div>
+                                    <div class="time-box">
+                                        <span id="hours">00</span>
+                                        <span>h</span>
+                                    </div>
+                                    <div class="time-box">
+                                        <span id="minutes">00</span>
+                                        <span>m</span>
+                                    </div>
+                                    <div class="time-box">
+                                        <span id="seconds">00</span>
+                                        <span>s</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="gift-section">
-                        <span class="info-icon">🎁</span>
-                        <div class="info-text">
-                            <strong>Regalo:</strong>
-                            <span class="account-number">3701052530</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sección de confirmación -->
-                <div class="guest-section">
-                    <div class="input-group">
-                        <input type="text" id="guestName" placeholder="Tu nombre completo" required>
-                    </div>
-                    <button id="confirmBtn" class="confirm-btn" disabled>
-                        ✅ Confirmar Asistencia
-                    </button>
                     <div id="message" class="message"></div>
                 </div>
 
-                <!-- Lista de confirmados -->
-                <div class="confirmed-guests">
-                    <h3>👥 Confirmados</h3>
-                    <ul id="guestList"></ul>
-                </div>
-
-                <!-- CUENTA REGRESIVA -->
-                <div class="countdown">
-                    <div class="countdown-timer">
-                        <div class="time-box">
-                            <span id="days">00</span>
-                            <span>días</span>
-                        </div>
-                        <div class="time-box">
-                            <span id="hours">00</span>
-                            <span>horas</span>
-                        </div>
-                        <div class="time-box">
-                            <span id="minutes">00</span>
-                            <span>min</span>
-                        </div>
-                        <div class="time-box">
-                            <span id="seconds">00</span>
-                            <span>seg</span>
+                <!-- PARTE INFERIOR - TRES COLUMNAS -->
+                <div class="bottom-three-columns">
+                    <!-- COLUMNA IZQUIERDA: Vestimenta -->
+                    <div class="column-left">
+                        <div class="vestimenta-box">
+                            <span class="info-icon">🌹</span>
+                            <div class="info-text">
+                                <strong>Vestimenta negra</strong>
+                                <span>Exclusiva para la</span>
+                                <span>15añera</span>
+                            </div>
                         </div>
                     </div>
-                    <p class="deadline-note">⚠️ Confirma antes del 29 de Mayo 2026</p>
+
+                    <!-- COLUMNA CENTRAL: Fecha, hora, lugar y mapa -->
+                    <div class="event-details-compact">
+    <div class="detail-row">
+        <span class="detail-chip">📅 13 JUNIO • 🕷️ 22:00 h</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-chip">🕸️ Nuevo Salón Azul</span>
+        <span class="detail-chip">📍 José Belloni 3342</span>
+    </div>
+    <a href="https://maps.app.goo.gl/LX1qvkwKApb9qiAA6" target="_blank" class="map-btn-compact">
+        🕷️ VER UBICACIÓN 🕷️
+    </a>
+</div>
+
+                    <!-- COLUMNA DERECHA: Obsequios -->
+                    <div class="column-right">
+                        <div class="obsequios-box">
+                            <span class="info-icon">⚰️</span>
+                            <div class="info-text">
+                                <strong>Obsequios</strong>
+                                <span>cuenta mi dinero</span>
+                                <span class="account-number">3701052530</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="music-control">
-        <button id="musicToggle" class="music-btn">🎵 Activar Música</button>
+        <button id="musicToggle" class="music-btn">🌙 ACTIVAR MÚSICA 🌙</button>
     </div>
 
     <audio id="bgMusic" loop>
         <source src="musica-natasha.mp3" type="audio/mpeg">
-        Tu navegador no soporta audio
     </audio>
 
     <script src="script.js"></script>
