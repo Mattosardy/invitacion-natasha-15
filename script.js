@@ -1,10 +1,10 @@
 // ============================================
 // INVITACIÓN 15 AÑOS - NATASHA
-// Con integración a SheetDB (base de datos compartida)
+// Con integración a Google Apps Script
 // ============================================
 
-// Configuración de SheetDB
-const SHEETDB_URL = "https://sheetdb.io/api/v1/csd1vhl35hj05";
+// Configuración de Google Apps Script (la URL la pegarás después)
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3x1LApL5ArMKCr8AUiZNQKjC4WILKmSRT2JWG0kaY3FW01IlMkHUx9S0vWr9wEu-F/exec";
 
 const confirmBtn = document.getElementById('confirmBtn');
 const guestNameInput = document.getElementById('guestName');
@@ -26,20 +26,23 @@ function obtenerNombreDeURL() {
 }
 
 // ============================================
-// VERIFICAR QUE EL NOMBRE ESTÉ EN SHEETDB
+// FUNCIÓN PARA NORMALIZAR TEXTOS (ignorar tildes, mayúsculas, espacios)
 // ============================================
-async function verificarNombreEnSheetDB(nombre) {
+function normalizar(texto) {
+    return texto
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .replace(/\s+/g, ' ');
+}
+
+// ============================================
+// VERIFICAR QUE EL NOMBRE ESTÉ EN LA BASE DE DATOS
+// ============================================
+async function verificarNombreEnDB(nombre) {
     try {
-        const response = await fetch(SHEETDB_URL);
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=listar`);
         const data = await response.json();
-        
-        function normalizar(texto) {
-            return texto
-                .toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .trim()
-                .replace(/\s+/g, ' ');
-        }
         
         const nombreNormalizado = normalizar(nombre);
         
@@ -50,46 +53,31 @@ async function verificarNombreEnSheetDB(nombre) {
         
         return encontrado || null;
     } catch (error) {
-        console.error('Error verificando en SheetDB:', error);
+        console.error('Error verificando:', error);
         return null;
     }
 }
 
 // ============================================
-// GUARDAR CONFIRMACIÓN EN SHEETDB
+// GUARDAR CONFIRMACIÓN
 // ============================================
-async function guardarConfirmacionEnSheetDB(nombre) {
+async function guardarConfirmacion(nombre) {
     try {
-        const searchResponse = await fetch(`${SHEETDB_URL}/search?nombre=${encodeURIComponent(nombre)}`);
-        const existing = await searchResponse.json();
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'confirmar',
+                nombre: nombre,
+                fecha: new Date().toISOString()
+            })
+        });
         
-        if (existing && existing.length > 0) {
-            await fetch(`${SHEETDB_URL}/nombre/${encodeURIComponent(nombre)}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    confirmado: "SI",
-                    fecha_confirmacion: new Date().toISOString()
-                })
-            });
-        } else {
-            await fetch(SHEETDB_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nombre: nombre,
-                    telefono: "",
-                    cantidad_personas: "1",
-                    confirmado: "SI",
-                    fecha_confirmacion: new Date().toISOString(),
-                    ip: ""
-                })
-            });
-        }
-        console.log('✅ Confirmación guardada en SheetDB');
-        return true;
+        const resultado = await response.json();
+        console.log('Respuesta:', resultado);
+        return resultado.success === true;
     } catch (error) {
-        console.error('Error guardando en SheetDB:', error);
+        console.error('Error guardando:', error);
         return false;
     }
 }
@@ -152,10 +140,10 @@ async function confirmarAsistencia() {
         return;
     }
     
-    mostrarMensaje('🔄 Verificando en la base de datos...', 'success');
+    mostrarMensaje('🔄 Verificando...', 'success');
     
     try {
-        const invitadoEnDB = await verificarNombreEnSheetDB(nombreInvitado);
+        const invitadoEnDB = await verificarNombreEnDB(nombreInvitado);
         
         if (!invitadoEnDB) {
             mostrarMensaje('❌ Lo sentimos, tu nombre no está en la lista de invitados.', 'error');
@@ -167,16 +155,9 @@ async function confirmarAsistencia() {
             return;
         }
         
-        const updateResponse = await fetch(`${SHEETDB_URL}/nombre/${encodeURIComponent(invitadoEnDB.nombre)}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                confirmado: "SI",
-                fecha_confirmacion: new Date().toISOString()
-            })
-        });
+        const guardado = await guardarConfirmacion(nombreInvitado);
         
-        if (updateResponse.ok) {
+        if (guardado) {
             invitados.push({
                 nombre: nombreInvitado,
                 fecha: new Date().toISOString()
@@ -190,7 +171,7 @@ async function confirmarAsistencia() {
         
     } catch (error) {
         console.error('Error general:', error);
-        mostrarMensaje('❌ Error de conexión. Revisá tu internet y volvé a intentar.', 'error');
+        mostrarMensaje('❌ Error de conexión. Revisá tu internet.', 'error');
     }
 }
 
@@ -317,4 +298,4 @@ setTimeout(() => {
     mostrarContenidoPrincipal();
 }, tiempoEspera);
 
-console.log('✅ Invitación lista con SheetDB');
+console.log('✅ Invitación lista con Google Apps Script');
