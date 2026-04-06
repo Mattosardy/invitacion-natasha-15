@@ -321,12 +321,16 @@
         }
 
         function enviarInvitacionPorWhatsApp(index) {
-            const invitado = listaInvitados[index];
-            const nombreCodificado = encodeURIComponent(invitado.nombre);
-            const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0aTe invito a celebrar mis 15 años.%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0ahttps://mattosardy.github.io/invitacion-natasha-15/?nombre=${nombreCodificado}%0a%0a¡Te esperamos! 🎉`;
-            const url = `https://wa.me/${invitado.telefono}?text=${mensaje}`;
-            window.open(url, '_blank');
-        }
+    const invitado = listaInvitados[index];
+    // Codificar el nombre correctamente para la URL
+    const nombreCodificado = encodeURIComponent(invitado.nombre);
+    const enlaceCompleto = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${nombreCodificado}`;
+    
+    const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0aTe invito a celebrar mis 15 años.%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0a${enlaceCompleto}%0a%0a¡Te esperamos! 🎉`;
+    
+    const url = `https://wa.me/${invitado.telefono}?text=${mensaje}`;
+    window.open(url, '_blank');
+}
 
         function actualizarTabla() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
