@@ -258,81 +258,79 @@
         // CARGAR LISTA DESDE SHEETDB
         // ==========================================
         async function cargarLista() {
-            try {
-                const response = await fetch(SHEETDB_URL);
-                const data = await response.json();
-                
-                if (data && data.length > 0) {
-                    listaInvitados = data.map(inv => ({
-                        nombre: inv.nombre,
-                        telefono: inv.telefono || "",
-                        cantidad: parseInt(inv.cantidad_personas) || 1,
-                        confirmado: inv.confirmado === "SI",
-                        fechaConfirmacion: inv.fecha_confirmacion || null
-                    }));
-                    guardarListaLocal();
-                    actualizarTabla();
-                    console.log('✅ Datos cargados desde SheetDB');
-                    return;
-                }
-            } catch (error) {
-                console.log('SheetDB no disponible, usando localStorage');
-            }
-            
-            // Fallback a localStorage
-            const guardada = localStorage.getItem(STORAGE_KEY);
-            if (guardada) {
-                listaInvitados = JSON.parse(guardada);
-                actualizarTabla();
-            }
+    try {
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=listar`);
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            listaInvitados = data.map(inv => ({
+                nombre: inv.nombre,
+                telefono: inv.telefono?.toString() || "",
+                cantidad: parseInt(inv.cantidad_personas) || 1,
+                confirmado: inv.confirmado === "SI",
+                fechaConfirmacion: inv.fecha_confirmacion || null
+            }));
+            guardarListaLocal();
+            actualizarTabla();
+            console.log('✅ Datos cargados desde Apps Script');
+            return;
         }
-
-        function guardarListaLocal() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados));
-        }
+    } catch (error) {
+        console.error('Error cargando desde Apps Script:', error);
+    }
+    
+    // Fallback a localStorage
+    const guardada = localStorage.getItem(STORAGE_KEY);
+    if (guardada) {
+        listaInvitados = JSON.parse(guardada);
+        actualizarTabla();
+    }
+}
 
         // ==========================================
-        // AGREGAR INVITADO A SHEETDB
-        // ==========================================
-        async function agregarInvitado() {
-            const nombre = document.getElementById('newNombre').value.trim();
-            const telefono = document.getElementById('newTelefono').value.trim();
-            const cantidad = parseInt(document.getElementById('newCantidad').value);
-            
-            if (!nombre || !telefono) {
-                alert('Completá nombre y teléfono');
-                return;
+// AGREGAR INVITADO A GOOGLE SHEETS (vía Apps Script)
+// ==========================================
+async function agregarInvitado() {
+    const nombre = document.getElementById('newNombre').value.trim();
+    const telefono = document.getElementById('newTelefono').value.trim();
+    const cantidad = parseInt(document.getElementById('newCantidad').value);
+    
+    if (!nombre || !telefono) {
+        alert('Completá nombre y teléfono');
+        return;
+    }
+    
+    try {
+        const nuevoInvitado = {
+            action: 'agregar',
+            datos: {
+                nombre: nombre,
+                telefono: telefono,
+                cantidad_personas: cantidad.toString()
             }
-            
-            try {
-                const nuevoInvitado = {
-                    nombre: nombre,
-                    telefono: telefono,
-                    cantidad_personas: cantidad.toString(),
-                    confirmado: "NO",
-                    fecha_confirmacion: "",
-                    ip: ""
-                };
-                
-                const response = await fetch(SHEETDB_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(nuevoInvitado)
-                });
-                
-                if (response.ok) {
-                    alert(`✅ ${nombre} agregado correctamente`);
-                    document.getElementById('newNombre').value = '';
-                    document.getElementById('newTelefono').value = '';
-                    cargarLista(); // Recargar desde SheetDB
-                } else {
-                    alert('❌ Error al agregar');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error de conexión con SheetDB');
-            }
+        };
+        
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevoInvitado)
+        });
+        
+        const resultado = await response.json();
+        
+        if (resultado.success) {
+            alert(`✅ ${nombre} agregado correctamente`);
+            document.getElementById('newNombre').value = '';
+            document.getElementById('newTelefono').value = '';
+            cargarLista(); // Recargar desde Apps Script
+        } else {
+            alert('❌ Error al agregar: ' + (resultado.message || ''));
         }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión con Google Sheets');
+    }
+}
 
         // ==========================================
         // ENVIAR INVITACIÓN POR WHATSAPP
