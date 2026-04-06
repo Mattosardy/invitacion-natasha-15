@@ -247,100 +247,115 @@
     </div>
 
     <script>
+        // ==========================================
+        // CONFIGURACIÓN SHEETDB
+        // ==========================================
+        const SHEETDB_URL = "https://sheetdb.io/api/v1/csd1vhl35hj05";
         const STORAGE_KEY = 'listaInvitadosNatasha';
         let listaInvitados = [];
 
-        const invitadosIniciales = [
-            { nombre: "Estrella Álvarez y Juan Carlos", telefono: "098036490", cantidad: 2, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Edardo Melgarejo", telefono: "097155420", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Solange Aguirre", telefono: "094633919", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Luis Cardozo", telefono: "095624113", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Marta Correa", telefono: "093774623", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Estela Silva", telefono: "094342362", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Sandra Chávez y familia", telefono: "094611825", cantidad: 4, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Ana Sastre y familia", telefono: "095128887", cantidad: 4, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Jorge Mederos y familia", telefono: "098488813", cantidad: 3, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Andrea Reynoso", telefono: "099301955", cantidad: 2, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Richard Rodríguez y familia", telefono: "094889342", cantidad: 3, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Matías Arballo y familia", telefono: "091950107", cantidad: 4, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Carolina Gómez", telefono: "097105789", cantidad: 2, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Sebastián Revello y familia", telefono: "095002373", cantidad: 4, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Agustina Laguna", telefono: "097044055", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Martina Sosa", telefono: "093822793", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Avril Giossi", telefono: "093821704", cantidad: 3, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Luana Montero", telefono: "097139839", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Sophia De Almeida", telefono: "093894516", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Mahia Larrosa", telefono: "097790304", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Kiara Mazza", telefono: "096421850", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Julieta Gamarra", telefono: "094416690", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Julieta Ortiz", telefono: "091415835", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Victoria Garrido", telefono: "097397058", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Oriana Conde", telefono: "099169526", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Luana Olivera", telefono: "098143558", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Ailem González", telefono: "095394799", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Melina Leyes", telefono: "096884182", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Chelsea Ifran", telefono: "098719332", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Sabrina Soria", telefono: "092311391", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Byron Arbelo", telefono: "092409688", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Aarón Guevara", telefono: "097754583", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Ezequiel Vázquez", telefono: "094213659", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Demian Riguetti", telefono: "096098087", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Diego Gutiérrez", telefono: "098714294", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Luciana Álvez", telefono: "097311165", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Valentina Aguiar", telefono: "092281522", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Valentina Maquiola", telefono: "094214501", cantidad: 1, confirmado: false, fechaConfirmacion: null },
-            { nombre: "Felipe Guzmán", telefono: "093500221", cantidad: 1, confirmado: false, fechaConfirmacion: null }
-        ];
-
-        function restablecerLista() {
-            if (confirm('⚠️ ¿Restablecer la lista completa? Se perderán los cambios manuales.')) {
-                listaInvitados = JSON.parse(JSON.stringify(invitadosIniciales));
-                guardarLista();
-                actualizarTabla();
-                alert('✅ Lista restablecida con ' + listaInvitados.length + ' registros');
-            }
-        }
-
-        function cargarLista() {
-            const guardada = localStorage.getItem(STORAGE_KEY);
-            if (guardada) {
-                const temporal = JSON.parse(guardada);
-                if (temporal && temporal.length > 0) {
-                    listaInvitados = temporal;
+        // ==========================================
+        // CARGAR LISTA DESDE SHEETDB
+        // ==========================================
+        async function cargarLista() {
+            try {
+                const response = await fetch(SHEETDB_URL);
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    listaInvitados = data.map(inv => ({
+                        nombre: inv.nombre,
+                        telefono: inv.telefono || "",
+                        cantidad: parseInt(inv.cantidad_personas) || 1,
+                        confirmado: inv.confirmado === "SI",
+                        fechaConfirmacion: inv.fecha_confirmacion || null
+                    }));
+                    guardarListaLocal();
                     actualizarTabla();
+                    console.log('✅ Datos cargados desde SheetDB');
                     return;
                 }
+            } catch (error) {
+                console.log('SheetDB no disponible, usando localStorage');
             }
-            listaInvitados = JSON.parse(JSON.stringify(invitadosIniciales));
-            guardarLista();
-            actualizarTabla();
+            
+            // Fallback a localStorage
+            const guardada = localStorage.getItem(STORAGE_KEY);
+            if (guardada) {
+                listaInvitados = JSON.parse(guardada);
+                actualizarTabla();
+            }
         }
 
-        function guardarLista() {
+        function guardarListaLocal() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados));
         }
 
-       function enviarInvitacionPorWhatsApp(index) {
-    const invitado = listaInvitados[index];
-    
-    // Crear un nombre simplificado para el enlace (sin espacios, sin "y familia")
-    let nombreSimplificado = invitado.nombre;
-    // Eliminar " y familia" y todo lo que venga después
-    nombreSimplificado = nombreSimplificado.split(' y ')[0];
-    // Eliminar " +" y lo que venga después
-    nombreSimplificado = nombreSimplificado.split(' +')[0];
-    // Reemplazar espacios por guiones
-    nombreSimplificado = nombreSimplificado.replace(/\s+/g, '-');
-    // Codificar para URL
-    const nombreCodificado = encodeURIComponent(nombreSimplificado);
-    const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${nombreCodificado}`;
-    
-    const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0aTe invito a celebrar mis 15 años.%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0a${enlace}%0a%0a¡Te esperamos! 🎉`;
-    
-    const url = `https://wa.me/${invitado.telefono}?text=${mensaje}`;
-    window.open(url, '_blank');
-}
+        // ==========================================
+        // AGREGAR INVITADO A SHEETDB
+        // ==========================================
+        async function agregarInvitado() {
+            const nombre = document.getElementById('newNombre').value.trim();
+            const telefono = document.getElementById('newTelefono').value.trim();
+            const cantidad = parseInt(document.getElementById('newCantidad').value);
+            
+            if (!nombre || !telefono) {
+                alert('Completá nombre y teléfono');
+                return;
+            }
+            
+            try {
+                const nuevoInvitado = {
+                    nombre: nombre,
+                    telefono: telefono,
+                    cantidad_personas: cantidad.toString(),
+                    confirmado: "NO",
+                    fecha_confirmacion: "",
+                    ip: ""
+                };
+                
+                const response = await fetch(SHEETDB_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevoInvitado)
+                });
+                
+                if (response.ok) {
+                    alert(`✅ ${nombre} agregado correctamente`);
+                    document.getElementById('newNombre').value = '';
+                    document.getElementById('newTelefono').value = '';
+                    cargarLista(); // Recargar desde SheetDB
+                } else {
+                    alert('❌ Error al agregar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error de conexión con SheetDB');
+            }
+        }
 
+        // ==========================================
+        // ENVIAR INVITACIÓN POR WHATSAPP
+        // ==========================================
+        function enviarInvitacionPorWhatsApp(index) {
+            const invitado = listaInvitados[index];
+            
+            let nombreSimplificado = invitado.nombre;
+            nombreSimplificado = nombreSimplificado.split(' y ')[0];
+            nombreSimplificado = nombreSimplificado.split(' +')[0];
+            nombreSimplificado = nombreSimplificado.replace(/\s+/g, '-');
+            const nombreCodificado = encodeURIComponent(nombreSimplificado);
+            const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${nombreCodificado}`;
+            
+            const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0aTe invito a celebrar mis 15 años.%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0a${enlace}%0a%0a¡Te esperamos! 🎉`;
+            
+            const url = `https://wa.me/${invitado.telefono}?text=${mensaje}`;
+            window.open(url, '_blank');
+        }
+
+        // ==========================================
+        // ACTUALIZAR TABLA
+        // ==========================================
         function actualizarTabla() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const filtrados = listaInvitados.filter(i => 
@@ -350,7 +365,7 @@
 
             const tbody = document.getElementById('invitadosList');
             if (filtrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No hay invitados</tr</tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No hay invitados</tr</table>';
             } else {
                 tbody.innerHTML = filtrados.map((inv, idx) => {
                     const originalIndex = listaInvitados.findIndex(i => i === inv);
@@ -385,36 +400,9 @@
             document.getElementById('totalPendientes').textContent = totalRegistros - confirmados;
         }
 
-        function agregarInvitado() {
-            const nombre = document.getElementById('newNombre').value.trim();
-            const telefono = document.getElementById('newTelefono').value.trim();
-            const cantidad = parseInt(document.getElementById('newCantidad').value);
-            
-            if (!nombre) {
-                alert('El nombre es obligatorio');
-                return;
-            }
-            if (!telefono) {
-                alert('El número de teléfono es obligatorio');
-                return;
-            }
-            
-            listaInvitados.push({
-                nombre: nombre,
-                telefono: telefono,
-                cantidad: cantidad,
-                confirmado: false,
-                fechaConfirmacion: null
-            });
-            guardarLista();
-            actualizarTabla();
-            
-            document.getElementById('newNombre').value = '';
-            document.getElementById('newTelefono').value = '';
-            document.getElementById('newCantidad').value = '1';
-            alert(`✅ Invitado ${nombre} agregado`);
-        }
-
+        // ==========================================
+        // EXPORTAR A EXCEL
+        // ==========================================
         function exportarExcel() {
             let csv = "Nombre,Teléfono,Cantidad Personas,Estado,Fecha Confirmación\n";
             listaInvitados.forEach(i => {
@@ -429,36 +417,30 @@
             link.click();
         }
 
-        function sincronizarConfirmaciones() {
-            const confirmados = localStorage.getItem('invitadosFiesta');
-            if (confirmados) {
-                const listaConfirmados = JSON.parse(confirmados);
-                let cambios = false;
-                
-                listaConfirmados.forEach(conf => {
-                    const invitado = listaInvitados.find(i => i.nombre.toLowerCase() === conf.nombre.toLowerCase());
-                    if (invitado && !invitado.confirmado) {
-                        invitado.confirmado = true;
-                        invitado.fechaConfirmacion = conf.fecha;
-                        cambios = true;
-                    }
-                });
-                
-                if (cambios) {
-                    guardarLista();
-                    actualizarTabla();
-                }
+        // ==========================================
+        // RESTABLECER LISTA
+        // ==========================================
+        function restablecerLista() {
+            if (confirm('⚠️ ¿Restablecer la lista? Esta acción no afecta a SheetDB.')) {
+                cargarLista();
             }
         }
 
+        // ==========================================
+        // Sincronizar cada 5 segundos
+        // ==========================================
+        setInterval(cargarLista, 5000);
+
+        // ==========================================
+        // EVENTOS
+        // ==========================================
         document.getElementById('agregarBtn').addEventListener('click', agregarInvitado);
         document.getElementById('searchInput').addEventListener('input', actualizarTabla);
         document.getElementById('exportBtn').addEventListener('click', exportarExcel);
         document.getElementById('resetBtn').addEventListener('click', restablecerLista);
         
+        // INICIAR
         cargarLista();
-        sincronizarConfirmaciones();
-        setInterval(sincronizarConfirmaciones, 3000);
     </script>
 </body>
 </html>

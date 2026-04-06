@@ -1,7 +1,10 @@
 // ============================================
 // INVITACIÓN 15 AÑOS - NATASHA
-// Versión pulida con banner de acceso inválido
+// Con integración a SheetDB (base de datos compartida)
 // ============================================
+
+// Configuración de SheetDB
+const SHEETDB_URL = "https://sheetdb.io/api/v1/csd1vhl35hj05";
 
 const confirmBtn = document.getElementById('confirmBtn');
 const guestNameInput = document.getElementById('guestName');
@@ -21,42 +24,60 @@ function obtenerNombreDeURL() {
     return nombre ? decodeURIComponent(nombre) : null;
 }
 
-function verificarNombreEnLista(nombre) {
-    const listaCompleta = localStorage.getItem('listaInvitadosNatasha');
-    if (listaCompleta) {
-        const invitadosAdmin = JSON.parse(listaCompleta);
-        
-        // Función para normalizar (eliminar tildes, espacios, etc.)
-        function normalizar(texto) {
-            return texto
-                .toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/\s+/g, '')  // eliminar espacios
-                .replace(/-/g, '');   // eliminar guiones
-        }
-        
-        // También crear versión simplificada (solo primera palabra)
-        function simplificar(texto) {
-            // Tomar solo la primera parte antes de " y " o " +"
-            let simple = texto.split(' y ')[0];
-            simple = simple.split(' +')[0];
-            return normalizar(simple);
-        }
-        
-        const nombreNormalizado = normalizar(nombre);
-        const nombreSimplificado = simplificar(nombre);
-        
-        return invitadosAdmin.some(i => {
-            const nombreListaNormalizado = normalizar(i.nombre);
-            const nombreListaSimplificado = simplificar(i.nombre);
-            
-            return nombreListaNormalizado === nombreNormalizado ||
-                   nombreListaSimplificado === nombreSimplificado ||
-                   nombreListaNormalizado.includes(nombreNormalizado) ||
-                   nombreSimplificado === nombreNormalizado;
-        });
+// ============================================
+// VERIFICAR QUE EL NOMBRE ESTÉ EN SHEETDB
+// ============================================
+async function verificarNombreEnSheetDB(nombre) {
+    try {
+        const response = await fetch(`${SHEETDB_URL}/search?nombre=${encodeURIComponent(nombre)}`);
+        const data = await response.json();
+        return data && data.length > 0;
+    } catch (error) {
+        console.error('Error verificando en SheetDB:', error);
+        return false;
     }
-    return false;
+}
+
+// ============================================
+// GUARDAR CONFIRMACIÓN EN SHEETDB
+// ============================================
+async function guardarConfirmacionEnSheetDB(nombre) {
+    try {
+        // Primero buscar si ya existe
+        const searchResponse = await fetch(`${SHEETDB_URL}/search?nombre=${encodeURIComponent(nombre)}`);
+        const existing = await searchResponse.json();
+        
+        if (existing && existing.length > 0) {
+            // Actualizar existente
+            await fetch(`${SHEETDB_URL}/nombre/${encodeURIComponent(nombre)}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    confirmado: "SI",
+                    fecha_confirmacion: new Date().toISOString()
+                })
+            });
+        } else {
+            // Crear nuevo registro
+            await fetch(SHEETDB_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nombre: nombre,
+                    telefono: "",
+                    cantidad_personas: "1",
+                    confirmado: "SI",
+                    fecha_confirmacion: new Date().toISOString(),
+                    ip: ""
+                })
+            });
+        }
+        console.log('✅ Confirmación guardada en SheetDB');
+        return true;
+    } catch (error) {
+        console.error('Error guardando en SheetDB:', error);
+        return false;
+    }
 }
 
 // ============================================
@@ -68,6 +89,21 @@ function mostrarMensaje(texto, tipo) {
     setTimeout(() => {
         messageDiv.className = 'message';
     }, 4000);
+}
+
+// ============================================
+// ACTUALIZAR LISTA LOCAL
+// ============================================
+function actualizarListaLocal() {
+    if (invitados.length === 0) {
+        guestListElement.innerHTML = '<li style="text-align: center;">✨ Aún no hay confirmaciones ✨</li>';
+        return;
+    }
+    let html = '';
+    for (let i = 0; i < invitados.length; i++) {
+        html += `<li>✅ ${invitados[i].nombre}</li>`;
+    }
+    guestListElement.innerHTML = html;
 }
 
 // ============================================
@@ -87,7 +123,7 @@ function verificarFechaLimite() {
 // ============================================
 // CONFIRMAR ASISTENCIA
 // ============================================
-function confirmarAsistencia() {
+async function confirmarAsistencia() {
     if (verificarFechaLimite()) return;
     
     if (!nombreInvitado) {
@@ -95,36 +131,35 @@ function confirmarAsistencia() {
         return;
     }
     
-    // Cargar lista actualizada de confirmados
-    const guardados = localStorage.getItem('invitadosFiesta');
-    if (guardados) {
-        invitados = JSON.parse(guardados);
-    }
-    
-    // Verificar si ya confirmó antes
-    const yaConfirmo = invitados.some(invitado => invitado.nombre.toLowerCase() === nombreInvitado.toLowerCase());
-    if (yaConfirmo) {
+    // Verificar si ya confirmó localmente
+    const yaConfirmoLocal = invitados.some(invitado => invitado.nombre.toLowerCase() === nombreInvitado.toLowerCase());
+    if (yaConfirmoLocal) {
         mostrarMensaje('✅ Ya confirmaste tu asistencia. ¡Te esperamos!', 'error');
         return;
     }
     
-    // Verificar que el nombre esté en la lista de invitados del admin
-    const nombreValido = verificarNombreEnLista(nombreInvitado);
-    
-    if (!nombreValido) {
-        mostrarMensaje('❌ Lo sentimos, tu nombre no está en la lista de invitados. Por favor contactá a Natasha.', 'error');
+    // Verificar en SheetDB si ya confirmó
+    const existeEnSheetDB = await verificarNombreEnSheetDB(nombreInvitado);
+    if (!existeEnSheetDB) {
+        mostrarMensaje('❌ Lo sentimos, tu nombre no está en la lista de invitados.', 'error');
         return;
     }
     
-    // Guardar confirmación
-    invitados.push({
-        nombre: nombreInvitado,
-        fecha: new Date().toISOString()
-    });
+    // Guardar confirmación en SheetDB
+    const guardado = await guardarConfirmacionEnSheetDB(nombreInvitado);
     
-    localStorage.setItem('invitadosFiesta', JSON.stringify(invitados));
-    mostrarMensaje(`🎉 ¡Gracias ${nombreInvitado}! Has confirmado tu asistencia. ¡Te esperamos! 🎉`, 'success');
-    confirmBtn.disabled = true;
+    if (guardado) {
+        // Guardar también en localStorage local
+        invitados.push({
+            nombre: nombreInvitado,
+            fecha: new Date().toISOString()
+        });
+        localStorage.setItem('invitadosFiesta', JSON.stringify(invitados));
+        mostrarMensaje(`🎉 ¡Gracias ${nombreInvitado}! Has confirmado tu asistencia. ¡Te esperamos! 🎉`, 'success');
+        confirmBtn.disabled = true;
+    } else {
+        mostrarMensaje('❌ Error al guardar la confirmación. Intentá de nuevo.', 'error');
+    }
 }
 
 // ============================================
@@ -168,7 +203,28 @@ function actualizarCuentaRegresiva() {
 }
 
 // ============================================
-// CONTROL DE MÚSICA
+// PANTALLA DE BIENVENIDA
+// ============================================
+const welcomeScreen = document.getElementById('welcomeScreen');
+const mainContent = document.getElementById('mainContent');
+
+function mostrarContenidoPrincipal() {
+    if (welcomeScreen) {
+        welcomeScreen.classList.add('hide');
+        setTimeout(() => {
+            if (welcomeScreen && welcomeScreen.parentNode) {
+                welcomeScreen.style.display = 'none';
+            }
+        }, 1000);
+    }
+    if (mainContent) {
+        mainContent.classList.remove('hidden');
+        mainContent.classList.add('visible');
+    }
+}
+
+// ============================================
+// MÚSICA AUTOMÁTICA
 // ============================================
 let musicaActiva = false;
 const musica = document.getElementById('bgMusic');
@@ -177,11 +233,11 @@ const botonMusica = document.getElementById('musicToggle');
 function controlarMusica() {
     if (musicaActiva) {
         musica.pause();
-        botonMusica.textContent = '🎵 Activar Música';
+        botonMusica.textContent = '🎵 ACTIVAR MÚSICA';
         musicaActiva = false;
     } else {
         musica.play().then(() => {
-            botonMusica.textContent = '🔇 Silenciar';
+            botonMusica.textContent = '🔇 SILENCIAR';
             musicaActiva = true;
         }).catch(() => {
             mostrarMensaje('🎵 Haz clic para activar la música', 'error');
@@ -219,107 +275,14 @@ function init() {
 confirmBtn.addEventListener('click', confirmarAsistencia);
 if (botonMusica) botonMusica.addEventListener('click', controlarMusica);
 
-// INICIAR
+// Iniciar
 init();
 
-console.log('✅ Invitación lista - Versión pulida');
-
-// ==========================================
-// PANTALLA DE BIENVENIDA (7 segundos) - VERSIÓN MEJORADA
-// ==========================================
-const welcomeScreen = document.getElementById('welcomeScreen');
-const mainContent = document.getElementById('mainContent');
-
-// Función para ocultar bienvenida y mostrar contenido
-function mostrarContenidoPrincipal() {
-    if (welcomeScreen) {
-        welcomeScreen.classList.add('hide');
-        setTimeout(() => {
-            if (welcomeScreen && welcomeScreen.parentNode) {
-                welcomeScreen.style.display = 'none';
-            }
-        }, 1000);
-    }
-    
-    if (mainContent) {
-        mainContent.classList.remove('hidden');
-        mainContent.classList.add('visible');
-    }
-}
-
-// Si el dispositivo es celular, reducir el tiempo a 5 segundos
+// Pantalla de bienvenida
 const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-const tiempoEspera = esMovil ? 5000 : 7000; // 5 seg en celular, 7 en PC
-
-// Forzar que la pantalla de bienvenida se vea bien en celular
-if (welcomeScreen) {
-    welcomeScreen.style.position = 'fixed';
-    welcomeScreen.style.top = '0';
-    welcomeScreen.style.left = '0';
-    welcomeScreen.style.width = '100%';
-    welcomeScreen.style.height = '100%';
-    welcomeScreen.style.zIndex = '2000';
-    welcomeScreen.style.backgroundColor = 'rgba(0,0,0,0.95)';
-    welcomeScreen.style.display = 'flex';
-    welcomeScreen.style.alignItems = 'center';
-    welcomeScreen.style.justifyContent = 'center';
-}
-
-// Mostrar contenido después del tiempo establecido
+const tiempoEspera = esMovil ? 5000 : 7000;
 setTimeout(() => {
     mostrarContenidoPrincipal();
 }, tiempoEspera);
 
-// También ocultar si el usuario hace clic en la pantalla (opcional)
-if (welcomeScreen) {
-    welcomeScreen.addEventListener('click', function() {
-        mostrarContenidoPrincipal();
-    });
-}
-// ==========================================
-// MÚSICA AUTOMÁTICA
-// ==========================================
-const musicaAuto = document.getElementById('bgMusic');
-const botonMusicaAuto = document.getElementById('musicToggle');
-let musicaActivaAuto = false;
-
-function iniciarMusica() {
-    if (musicaAuto && !musicaActivaAuto) {
-        musicaAuto.play().then(() => {
-            musicaActivaAuto = true;
-            if (botonMusicaAuto) botonMusicaAuto.textContent = '🔇 SILENCIAR';
-            console.log('🎵 Música iniciada');
-        }).catch(() => {
-            console.log('🎵 Autoplay bloqueado');
-            if (botonMusicaAuto) botonMusicaAuto.textContent = '🎵 ACTIVAR MÚSICA';
-        });
-    }
-}
-
-function toggleMusica() {
-    if (musicaActivaAuto) {
-        musicaAuto.pause();
-        botonMusicaAuto.textContent = '🎵 ACTIVAR MÚSICA';
-        musicaActivaAuto = false;
-    } else {
-        musicaAuto.play().then(() => {
-            botonMusicaAuto.textContent = '🔇 SILENCIAR';
-            musicaActivaAuto = true;
-        }).catch(() => {
-            alert('Haz clic en la página para activar la música');
-        });
-    }
-}
-
-// Intentar iniciar música al cargar
-setTimeout(iniciarMusica, 1000);
-
-// También al hacer clic en cualquier parte
-document.addEventListener('click', function() {
-    iniciarMusica();
-}, { once: true });
-
-// Asignar evento al botón
-if (botonMusicaAuto) {
-    botonMusicaAuto.addEventListener('click', toggleMusica);
-}
+console.log('✅ Invitación lista con SheetDB');

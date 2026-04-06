@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portero - Lista de Confirmados | Natasha 15 Años</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #0f0a0c;
+            border-radius: 25px;
+            padding: 25px;
+            border: 1px solid #e94560;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #e94560;
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 1.8em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #c9c9c9;
+            margin-bottom: 25px;
+            font-size: 0.8em;
+        }
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00ff00;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #e94560;
+            color: #fff;
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(233,69,96,0.3);
+            color: #e0e0e0;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #e94560;
+            border-radius: 30px;
+            color: #fff;
+            text-align: center;
+        }
+        .badge {
+            background: rgba(0,255,0,0.2);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            color: #00ff00;
+        }
+        @media (max-width: 700px) {
+            th, td { font-size: 0.7em; padding: 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🚪 LISTA DE CONFIRMADOS 🚪</h1>
+            <div class="subtitle">Solo pueden ingresar los que aparecen acá</div>
+
+            <div class="stats">
+                <div class="stat-number" id="totalConfirmados">0</div>
+                <div class="stat-label">Personas confirmadas</div>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre...">
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr><th>Nombre</th><th>Personas</th></tr>
+                    </thead>
+                    <tbody id="confirmadosList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN - MISMA URL DE SHEETDB
+        // ==========================================
+        const SHEETDB_URL = "https://sheetdb.io/api/v1/csd1vhl35hj05";  // <-- REEMPLAZÁ
+        
+        let confirmados = [];
+
+        async function cargarConfirmados() {
+            try {
+                const response = await fetch(SHEETDB_URL);
+                const data = await response.json();
+                confirmados = data.filter(inv => inv.confirmado === "SI");
+                actualizarTabla();
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        function actualizarTabla() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtrados = confirmados.filter(i => 
+                i.nombre?.toLowerCase().includes(searchTerm)
+            );
+
+            const tbody = document.getElementById('confirmadosList');
+            if (filtrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" style="text-align:center">No hay confirmados aún</tr>';
+            } else {
+                tbody.innerHTML = filtrados.map(inv => {
+                    const cantidad = parseInt(inv.cantidad_personas) || 1;
+                    return `
+                        <tr>
+                            <td>${inv.nombre}</td>
+                            <td><span class="badge">${cantidad} persona${cantidad !== 1 ? 's' : ''}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            const total = confirmados.reduce((sum, inv) => sum + (parseInt(inv.cantidad_personas) || 1), 0);
+            document.getElementById('totalConfirmados').textContent = total;
+        }
+
+        document.getElementById('searchInput').addEventListener('input', actualizarTabla);
+        
+        cargarConfirmados();
+        setInterval(cargarConfirmados, 5000);
+    </script>
+</body>
+</html>

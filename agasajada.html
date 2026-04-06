@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natasha - Cargar Invitados | 15 Años</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #0f0a0c;
+            border-radius: 25px;
+            padding: 25px;
+            border: 1px solid #e94560;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #e94560;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #c9c9c9;
+            margin-bottom: 25px;
+            font-size: 0.8em;
+        }
+        .form-agregar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .form-agregar input, .form-agregar select {
+            flex: 1;
+            padding: 12px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #e94560;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 0.9em;
+            min-width: 120px;
+        }
+        .form-agregar button {
+            background: #e94560;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            flex: 1;
+            background: rgba(233,69,96,0.2);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e94560;
+        }
+        .stat-label {
+            font-size: 0.7em;
+            color: #c9c9c9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #e94560;
+            color: #fff;
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(233,69,96,0.3);
+            color: #e0e0e0;
+        }
+        .confirmado {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        .pendiente {
+            color: #e94560;
+            font-weight: bold;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #e94560;
+            border-radius: 30px;
+            color: #fff;
+            text-align: center;
+        }
+        @media (max-width: 700px) {
+            th, td { font-size: 0.7em; padding: 6px; }
+            .form-agregar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🎸 BIENVENIDA NATASHA 🎸</h1>
+            <div class="subtitle">Cargá la lista de invitados para tus 15 años</div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalInvitados">0</div>
+                    <div class="stat-label">Total Invitados</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalConfirmados">0</div>
+                    <div class="stat-label">Confirmados</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalPendientes">0</div>
+                    <div class="stat-label">Pendientes</div>
+                </div>
+            </div>
+
+            <div class="form-agregar">
+                <input type="text" id="newNombre" placeholder="Nombre completo">
+                <input type="tel" id="newTelefono" placeholder="Teléfono (ej: 091950107)">
+                <select id="newCantidad">
+                    <option value="1">+0 (solo él/ella)</option>
+                    <option value="2">+1 persona</option>
+                    <option value="3">+2 personas</option>
+                    <option value="4">+3 personas</option>
+                    <option value="5">+4 personas</option>
+                    <option value="6">+5 personas</option>
+                </select>
+                <button id="agregarBtn">➕ Agregar invitado</button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre o teléfono...">
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr><th>Nombre</th><th>Teléfono</th><th>Personas</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody id="invitadosList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN - REEMPLAZÁ CON TU URL DE SHEETDB
+        // ==========================================
+        const SHEETDB_URL = "https://sheetdb.io/api/v1/csd1vhl35hj05";  // <-- REEMPLAZÁ
+        
+        let listaInvitados = [];
+
+        // ==========================================
+        // CARGAR DATOS DESDE SHEETDB
+        // ==========================================
+        async function cargarLista() {
+            try {
+                const response = await fetch(SHEETDB_URL);
+                const data = await response.json();
+                listaInvitados = data;
+                actualizarTabla();
+            } catch (error) {
+                console.error("Error al cargar:", error);
+            }
+        }
+
+        // ==========================================
+        // AGREGAR INVITADO
+        // ==========================================
+        async function agregarInvitado() {
+            const nombre = document.getElementById('newNombre').value.trim();
+            const telefono = document.getElementById('newTelefono').value.trim();
+            const cantidad = document.getElementById('newCantidad').value;
+            
+            if (!nombre || !telefono) {
+                alert('Completá nombre y teléfono');
+                return;
+            }
+            
+            const nuevoInvitado = {
+                nombre: nombre,
+                telefono: telefono,
+                cantidad_personas: cantidad,
+                confirmado: "NO",
+                fecha_confirmacion: "",
+                ip: ""
+            };
+            
+            try {
+                const response = await fetch(SHEETDB_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevoInvitado)
+                });
+                
+                if (response.ok) {
+                    alert(`✅ ${nombre} agregado correctamente`);
+                    document.getElementById('newNombre').value = '';
+                    document.getElementById('newTelefono').value = '';
+                    cargarLista(); // Recargar
+                } else {
+                    alert('❌ Error al agregar');
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert('❌ Error de conexión');
+            }
+        }
+
+        // ==========================================
+        // ACTUALIZAR TABLA
+        // ==========================================
+        function actualizarTabla() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtrados = listaInvitados.filter(i => 
+                i.nombre?.toLowerCase().includes(searchTerm) || 
+                i.telefono?.includes(searchTerm)
+            );
+
+            const tbody = document.getElementById('invitadosList');
+            if (filtrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No hay invitados</tr>';
+            } else {
+                tbody.innerHTML = filtrados.map(inv => {
+                    const cantidad = parseInt(inv.cantidad_personas) || 1;
+                    const personasExtras = cantidad - 1;
+                    const mostrarNombre = personasExtras > 0 ? `${inv.nombre} +${personasExtras}` : inv.nombre;
+                    const confirmado = inv.confirmado === "SI";
+                    return `
+                        <tr>
+                            <td>${mostrarNombre} <span style="background:rgba(233,69,96,0.3);padding:2px 8px;border-radius:20px;font-size:0.7em;">${cantidad} pers</span></td>
+                            <td>${inv.telefono}</td>
+                            <td>${cantidad}</td>
+                            <td class="${confirmado ? 'confirmado' : 'pendiente'}">
+                                ${confirmado ? '✅ CONFIRMADO' : '⏳ PENDIENTE'}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            const total = listaInvitados.length;
+            const confirmados = listaInvitados.filter(i => i.confirmado === "SI").length;
+            document.getElementById('totalInvitados').textContent = total;
+            document.getElementById('totalConfirmados').textContent = confirmados;
+            document.getElementById('totalPendientes').textContent = total - confirmados;
+        }
+
+        // ==========================================
+        // EVENTOS
+        // ==========================================
+        document.getElementById('agregarBtn').addEventListener('click', agregarInvitado);
+        document.getElementById('searchInput').addEventListener('input', actualizarTabla);
+        
+        // INICIAR
+        cargarLista();
+        setInterval(cargarLista, 5000); // Actualizar cada 5 segundos
+    </script>
+</body>
+</html>
