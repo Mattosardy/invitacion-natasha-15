@@ -41,96 +41,106 @@
             <div class="gothic-corner br"></div>
             
             <div class="content">
-                <!-- TÍTULO -->
-                <div class="title-section">
-                    <div class="gothic-cross">†</div>
-                    <div class="metal-band">✦ MIS 15 AÑOS ✦</div>
-                    <h1 class="title">NATASHA</h1>
-                <div class="gothic-cross bottom">†</div>
+                
+                <!-- PANTALLA DE BIENVENIDA (7 segundos) -->
+                <div id="welcomeScreen" class="welcome-screen">
+                    <div class="welcome-text">
+                        <div class="welcome-small">te invito a festejar</div>
+                        <div class="welcome-big">MIS 15 AÑOS</div>
+                    </div>
                 </div>
 
-                <!-- ESPACIO VACÍO CENTRAL (VIDEO PROTAGONISTA) -->
-                <div class="empty-space"></div>
+                <!-- CONTENIDO PRINCIPAL (oculto al inicio) -->
+                <div id="mainContent" class="main-content hidden">
+                    
+                    <!-- TÍTULO -->
+                    <div class="title-section">
+                        <div class="gothic-cross">†</div>
+                        <div class="metal-band">✦ MIS 15 AÑOS ✦</div>
+                        <h1 class="title">NATASHA</h1>
+                        <div class="subtitle-gothic">XV • AÑOS • MMXXVI</div>
+                        <div class="gothic-cross bottom">†</div>
+                    </div>
 
-                <!-- SECCIÓN UNIFICADA: botón + nombre + cuenta regresiva -->
-                <div class="action-section">
-                    <div class="unified-box">
-                        <div class="unified-row">
-                            <button id="confirmBtn" class="confirm-btn" disabled>
-                                🦇 CONFIRMAR
-                            </button>
-                            <div class="nombre-invitado-linea">
-                                <div id="guestNameDisplay" class="nombre-automatico-linea">🎸 Cargando...</div>
-                                <input type="hidden" id="guestName" readonly>
-                            </div>
-                            <div class="countdown-numbers">
-                                <div class="countdown-timer">
-                                    <div class="time-box">
-                                        <span id="days">00</span>
-                                        <span>d</span>
-                                    </div>
-                                    <div class="time-box">
-                                        <span id="hours">00</span>
-                                        <span>h</span>
-                                    </div>
-                                    <div class="time-box">
-                                        <span id="minutes">00</span>
-                                        <span>m</span>
-                                    </div>
-                                    <div class="time-box">
-                                        <span id="seconds">00</span>
-                                        <span>s</span>
+                    <!-- ESPACIO VACÍO CENTRAL -->
+                    <div class="empty-space"></div>
+
+                    <!-- SECCIÓN UNIFICADA -->
+                    <div class="action-section">
+                        <div class="unified-box">
+                            <div class="unified-row">
+                                <button id="confirmBtn" class="confirm-btn" disabled>
+                                    🦇 CONFIRMAR
+                                </button>
+                                <div class="nombre-invitado-linea">
+                                    <div id="guestNameDisplay" class="nombre-automatico-linea">🎸 Cargando...</div>
+                                    <input type="hidden" id="guestName" readonly>
+                                </div>
+                                <div class="countdown-numbers">
+                                    <div class="countdown-timer">
+                                        <div class="time-box">
+                                            <span id="days">00</span>
+                                            <span>d</span>
+                                        </div>
+                                        <div class="time-box">
+                                            <span id="hours">00</span>
+                                            <span>h</span>
+                                        </div>
+                                        <div class="time-box">
+                                            <span id="minutes">00</span>
+                                            <span>m</span>
+                                        </div>
+                                        <div class="time-box">
+                                            <span id="seconds">00</span>
+                                            <span>s</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div id="message" class="message"></div>
                     </div>
-                    <div id="message" class="message"></div>
-                </div>
 
-                <!-- PARTE INFERIOR - TRES COLUMNAS -->
-                <div class="bottom-three-columns">
-                    <!-- COLUMNA IZQUIERDA: Vestimenta -->
-                    <div class="column-left">
-                        <div class="vestimenta-box">
-                            <span class="info-icon">🌹</span>
-                            <div class="info-text">
-                                <strong>Vestimenta negra</strong>
-                                <span>Exclusiva para la</span>
-                                <span>15añera</span>
+                    <!-- PARTE INFERIOR - DOS COLUMNAS (Vestimenta + Obsequios) y Centro -->
+                    <div class="bottom-two-columns">
+                        <!-- COLUMNA IZQUIERDA: Vestimenta -->
+                        <div class="column-left">
+                            <div class="vestimenta-box">
+                                <span class="info-icon">🌹</span>
+                                <div class="info-text">
+                                    <strong>Vestimenta negra</strong>
+                                    <span>Exclusiva para la</span>
+                                    <span>15añera</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- COLUMNA CENTRAL: Ubicación y mapa -->
+                        <div class="column-center">
+                            <div class="event-details-compact">
+                                <a href="https://maps.app.goo.gl/LX1qvkwKApb9qiAA6" target="_blank" class="map-btn-compact">
+                                    🕷️🕸️ Nuevo Salón Azul José Belloni 3342 📍VER UBICACIÓN 🕷️
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- COLUMNA DERECHA: Obsequios -->
+                        <div class="column-right">
+                            <div class="obsequios-box">
+                                <span class="info-icon">⚰️</span>
+                                <div class="info-text">
+                                    <strong>Obsequios</strong>
+                                    <span>cuenta mi dinero</span>
+                                    <span class="account-number">3701052530</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- COLUMNA CENTRAL: Fecha, hora, lugar y mapa -->
-                    <div class="event-details-compact">
-    <div class="detail-row">
-        <span class="detail-chip">📅 13 JUNIO • 🕷️ 22:00 h</span>
-    </div>
-    <div class="detail-row">
-        <span class="detail-chip">🕸️ Nuevo Salón Azul</span>
-        <span class="detail-chip">📍 José Belloni 3342</span>
-    </div>
-    <a href="https://maps.app.goo.gl/LX1qvkwKApb9qiAA6" target="_blank" class="map-btn-compact">
-        🕷️ VER UBICACIÓN 🕷️
-    </a>
-</div>
-
-                    <!-- COLUMNA DERECHA: Obsequios -->
-                    <div class="column-right">
-                        <div class="obsequios-box">
-                            <span class="info-icon">⚰️</span>
-                            <div class="info-text">
-                                <strong>Obsequios</strong>
-                                <span>cuenta mi dinero</span>
-                                <span class="account-number">3701052530</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                    
+                </div> <!-- FIN mainContent -->
+            </div> <!-- FIN content -->
+        </div> <!-- FIN invitation-card -->
+    </div> <!-- FIN container -->
 
     <div class="music-control">
         <button id="musicToggle" class="music-btn">🌙 ACTIVAR MÚSICA 🌙</button>

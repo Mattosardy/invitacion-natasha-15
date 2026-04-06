@@ -197,3 +197,23 @@ if (botonMusica) botonMusica.addEventListener('click', controlarMusica);
 init();
 
 console.log('✅ Invitación lista - Versión pulida');
+
+// ==========================================
+// PANTALLA DE BIENVENIDA (7 segundos)
+// ==========================================
+const welcomeScreen = document.getElementById('welcomeScreen');
+const mainContent = document.getElementById('mainContent');
+
+// Mostrar contenido después de 7 segundos
+setTimeout(() => {
+    welcomeScreen.classList.add('hide');
+    mainContent.classList.remove('hidden');
+    mainContent.classList.add('visible');
+    
+    // Eliminar la pantalla de bienvenida del DOM después de la animación
+    setTimeout(() => {
+        if (welcomeScreen && welcomeScreen.parentNode) {
+            welcomeScreen.style.display = 'none';
+        }
+    }, 1000);
+}, 7000); // 7 segundos
