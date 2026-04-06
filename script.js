@@ -250,3 +250,50 @@ if (welcomeScreen) {
         mostrarContenidoPrincipal();
     });
 }
+// ==========================================
+// MÚSICA AUTOMÁTICA
+// ==========================================
+const musicaAuto = document.getElementById('bgMusic');
+const botonMusicaAuto = document.getElementById('musicToggle');
+let musicaActivaAuto = false;
+
+function iniciarMusica() {
+    if (musicaAuto && !musicaActivaAuto) {
+        musicaAuto.play().then(() => {
+            musicaActivaAuto = true;
+            if (botonMusicaAuto) botonMusicaAuto.textContent = '🔇 SILENCIAR';
+            console.log('🎵 Música iniciada');
+        }).catch(() => {
+            console.log('🎵 Autoplay bloqueado');
+            if (botonMusicaAuto) botonMusicaAuto.textContent = '🎵 ACTIVAR MÚSICA';
+        });
+    }
+}
+
+function toggleMusica() {
+    if (musicaActivaAuto) {
+        musicaAuto.pause();
+        botonMusicaAuto.textContent = '🎵 ACTIVAR MÚSICA';
+        musicaActivaAuto = false;
+    } else {
+        musicaAuto.play().then(() => {
+            botonMusicaAuto.textContent = '🔇 SILENCIAR';
+            musicaActivaAuto = true;
+        }).catch(() => {
+            alert('Haz clic en la página para activar la música');
+        });
+    }
+}
+
+// Intentar iniciar música al cargar
+setTimeout(iniciarMusica, 1000);
+
+// También al hacer clic en cualquier parte
+document.addEventListener('click', function() {
+    iniciarMusica();
+}, { once: true });
+
+// Asignar evento al botón
+if (botonMusicaAuto) {
+    botonMusicaAuto.addEventListener('click', toggleMusica);
+}

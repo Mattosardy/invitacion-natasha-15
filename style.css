@@ -243,7 +243,7 @@ body::before {
     color: #c9c9c9;
 }
 
-/* ========== TRES COLUMNAS INFERIORES (misma línea) ========== */
+/* ========== TRES COLUMNAS INFERIORES ========== */
 .bottom-two-columns {
     display: flex;
     flex-direction: row;
@@ -339,25 +339,83 @@ body::before {
     font-weight: bold;
 }
 
-/* Responsive: en celular se apilan verticalmente */
-@media (max-width: 550px) {
-    .bottom-two-columns {
-        flex-direction: column;
-        gap: 8px;
+/* ========== PANTALLA DE BIENVENIDA ========== */
+.welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: opacity 1s ease-out;
+}
+
+.welcome-screen.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.welcome-text {
+    text-align: center;
+    animation: pulseGlow 2s ease-in-out infinite;
+    padding: 20px;
+}
+
+.welcome-small {
+    color: #e94560;
+    font-size: 1.2em;
+    letter-spacing: 3px;
+    font-family: monospace;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(233,69,96,0.5);
+}
+
+.welcome-big {
+    color: #8B0000;
+    font-size: 2.8em;
+    font-weight: bold;
+    letter-spacing: 5px;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 15px rgba(139,0,0,0.5);
+}
+
+/* CONTENIDO PRINCIPAL */
+.main-content {
+    transition: opacity 1.5s ease-in;
+}
+
+.main-content.hidden {
+    opacity: 0;
+    visibility: hidden;
+    display: none;
+}
+
+.main-content.visible {
+    opacity: 1;
+    visibility: visible;
+    display: block;
+}
+
+/* ========== ANIMACIONES ========== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    .column-left, .column-center, .column-right {
-        width: 100%;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    .vestimenta-box, .obsequios-box {
-        justify-content: center;
-    }
-    
-    .map-btn-compact {
-        font-size: 0.55em;
-        padding: 6px;
-    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.7; text-shadow: 0 0 5px rgba(233,69,96,0.3); }
+    50% { opacity: 1; text-shadow: 0 0 20px rgba(233,69,96,0.8); }
 }
 
 /* ========== MENSAJES ========== */
@@ -430,6 +488,7 @@ body::before {
     display: none;
 }
 
+/* ========== RESPONSIVE ========== */
 @media (max-width: 550px) {
     .content {
         padding: 12px 10px;
@@ -485,7 +544,7 @@ body::before {
         font-size: 0.85em;
     }
     
-    /* CORRECCIÓN: Columnas en horizontal también en celular */
+    /* Columnas en horizontal en celular */
     .bottom-two-columns {
         flex-direction: row !important;
         flex-wrap: wrap;
@@ -495,17 +554,6 @@ body::before {
     .column-left, .column-center, .column-right {
         flex: 1;
         min-width: 100px;
-    }
-    
-    /* En celular muy pequeño, que se pongan una abajo de la otra */
-    @media (max-width: 450px) {
-        .bottom-two-columns {
-            flex-direction: column !important;
-        }
-        
-        .column-left, .column-center, .column-right {
-            width: 100%;
-        }
     }
     
     .vestimenta-box, .obsequios-box {
@@ -537,172 +585,8 @@ body::before {
     .gothic-border {
         height: 8px;
     }
-}
-/* ========================================== */
-/* PANTALLA DE BIENVENIDA (7 segundos) */
-/* ========================================== */
-.welcome-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.85);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(5px);
-    transition: opacity 1s ease-out;
-}
-
-.welcome-screen.hide {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.welcome-text {
-    text-align: center;
-    animation: pulseGlow 2s ease-in-out infinite;
-}
-
-.welcome-small {
-    color: #e94560;
-    font-size: 1em;
-    letter-spacing: 3px;
-    font-family: monospace;
-    margin-bottom: 10px;
-    text-shadow: 0 0 10px rgba(233,69,96,0.5);
-}
-
-.welcome-big {
-    color: #8B0000;
-    font-size: 2.5em;
-    font-weight: bold;
-    letter-spacing: 5px;
-    font-family: 'Courier New', monospace;
-    text-shadow: 0 0 15px rgba(139,0,0,0.5);
-}
-
-/* CONTENIDO PRINCIPAL (oculto al inicio) */
-.main-content {
-    transition: opacity 1.5s ease-in;
-}
-
-.main-content.hidden {
-    opacity: 0;
-    visibility: hidden;
-}
-
-.main-content.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Animación de entrada para los elementos */
-.main-content.visible .title-section,
-.main-content.visible .empty-space,
-.main-content.visible .action-section,
-.main-content.visible .bottom-three-columns {
-    animation: fadeInUp 0.6s ease-out forwards;
-}
-
-.main-content.visible .action-section { animation-delay: 0.1s; }
-.main-content.visible .bottom-three-columns { animation-delay: 0.2s; }
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes pulseGlow {
-    0%, 100% { opacity: 0.7; text-shadow: 0 0 5px rgba(233,69,96,0.3); }
-    50% { opacity: 1; text-shadow: 0 0 20px rgba(233,69,96,0.8); }
-}
-
-/* Responsive para pantalla de bienvenida */
-@media (max-width: 550px) {
-    .welcome-big {
-        font-size: 1.8em;
-        letter-spacing: 3px;
-    }
     
-    .welcome-small {
-        font-size: 0.8em;
-    }
-}
-/* ========================================== */
-/* PANTALLA DE BIENVENIDA - VERSIÓN MEJORADA */
-/* ========================================== */
-.welcome-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.95);
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(8px);
-    transition: opacity 1s ease-out;
-}
-
-.welcome-screen.hide {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.welcome-text {
-    text-align: center;
-    animation: pulseGlow 2s ease-in-out infinite;
-    padding: 20px;
-}
-
-.welcome-small {
-    color: #e94560;
-    font-size: 1.2em;
-    letter-spacing: 3px;
-    font-family: monospace;
-    margin-bottom: 15px;
-    text-shadow: 0 0 10px rgba(233,69,96,0.5);
-}
-
-.welcome-big {
-    color: #8B0000;
-    font-size: 2.8em;
-    font-weight: bold;
-    letter-spacing: 5px;
-    font-family: 'Courier New', monospace;
-    text-shadow: 0 0 15px rgba(139,0,0,0.5);
-}
-
-/* CONTENIDO PRINCIPAL */
-.main-content {
-    transition: opacity 1.5s ease-in;
-}
-
-.main-content.hidden {
-    opacity: 0;
-    visibility: hidden;
-    display: none;
-}
-
-.main-content.visible {
-    opacity: 1;
-    visibility: visible;
-    display: block;
-}
-
-/* Responsive celular */
-@media (max-width: 550px) {
+    /* Pantalla de bienvenida responsive */
     .welcome-small {
         font-size: 1em;
         letter-spacing: 2px;
@@ -714,61 +598,13 @@ body::before {
     }
 }
 
-@keyframes pulseGlow {
-    0%, 100% { opacity: 0.7; text-shadow: 0 0 5px rgba(233,69,96,0.3); }
-    50% { opacity: 1; text-shadow: 0 0 20px rgba(233,69,96,0.8); }
-    // ==========================================
-// INTENTAR REPRODUCIR MÚSICA AUTOMÁTICAMENTE
-// ==========================================
-const musica = document.getElementById('bgMusic');
-const botonMusica = document.getElementById('musicToggle');
-let musicaActiva = false;
-
-function intentarReproducirMusica() {
-    if (musica) {
-        musica.play().then(() => {
-            musicaActiva = true;
-            if (botonMusica) botonMusica.textContent = '🔇 SILENCIAR';
-            console.log('🎵 Música reproduciéndose automáticamente');
-        }).catch(error => {
-            console.log('🎵 Autoplay bloqueado por el navegador:', error);
-            if (botonMusica) botonMusica.textContent = '🎵 ACTIVAR MÚSICA';
-            // Mostrar mensaje suave
-            setTimeout(() => {
-                mostrarMensaje('🎵 Toca el botón de música para activar el sonido', 'error');
-            }, 1000);
-        });
+/* Pantallas muy pequeñas */
+@media (max-width: 450px) {
+    .bottom-two-columns {
+        flex-direction: column !important;
     }
-}
-
-// Reemplazar la función controlarMusica existente
-function controlarMusica() {
-    if (musicaActiva) {
-        musica.pause();
-        botonMusica.textContent = '🎵 ACTIVAR MÚSICA';
-        musicaActiva = false;
-    } else {
-        musica.play().then(() => {
-            botonMusica.textContent = '🔇 SILENCIAR';
-            musicaActiva = true;
-        }).catch(() => {
-            mostrarMensaje('🎵 Haz clic en la página para activar la música', 'error');
-        });
+    
+    .column-left, .column-center, .column-right {
+        width: 100%;
     }
-}
-
-// Intentar reproducir música al cargar la página
-document.addEventListener('click', function unaVez() {
-    intentarReproducirMusica();
-    document.removeEventListener('click', unaVez);
-}, { once: true });
-
-// También intentar al mostrar el contenido principal
-setTimeout(() => {
-    intentarReproducirMusica();
-}, 3000);
-
-// Asignar evento al botón
-if (botonMusica) {
-    botonMusica.addEventListener('click', controlarMusica);
 }
