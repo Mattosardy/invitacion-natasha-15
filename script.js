@@ -199,21 +199,54 @@ init();
 console.log('✅ Invitación lista - Versión pulida');
 
 // ==========================================
-// PANTALLA DE BIENVENIDA (7 segundos)
+// PANTALLA DE BIENVENIDA (7 segundos) - VERSIÓN MEJORADA
 // ==========================================
 const welcomeScreen = document.getElementById('welcomeScreen');
 const mainContent = document.getElementById('mainContent');
 
-// Mostrar contenido después de 7 segundos
-setTimeout(() => {
-    welcomeScreen.classList.add('hide');
-    mainContent.classList.remove('hidden');
-    mainContent.classList.add('visible');
+// Función para ocultar bienvenida y mostrar contenido
+function mostrarContenidoPrincipal() {
+    if (welcomeScreen) {
+        welcomeScreen.classList.add('hide');
+        setTimeout(() => {
+            if (welcomeScreen && welcomeScreen.parentNode) {
+                welcomeScreen.style.display = 'none';
+            }
+        }, 1000);
+    }
     
-    // Eliminar la pantalla de bienvenida del DOM después de la animación
-    setTimeout(() => {
-        if (welcomeScreen && welcomeScreen.parentNode) {
-            welcomeScreen.style.display = 'none';
-        }
-    }, 1000);
-}, 7000); // 7 segundos
+    if (mainContent) {
+        mainContent.classList.remove('hidden');
+        mainContent.classList.add('visible');
+    }
+}
+
+// Si el dispositivo es celular, reducir el tiempo a 5 segundos
+const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const tiempoEspera = esMovil ? 5000 : 7000; // 5 seg en celular, 7 en PC
+
+// Forzar que la pantalla de bienvenida se vea bien en celular
+if (welcomeScreen) {
+    welcomeScreen.style.position = 'fixed';
+    welcomeScreen.style.top = '0';
+    welcomeScreen.style.left = '0';
+    welcomeScreen.style.width = '100%';
+    welcomeScreen.style.height = '100%';
+    welcomeScreen.style.zIndex = '2000';
+    welcomeScreen.style.backgroundColor = 'rgba(0,0,0,0.95)';
+    welcomeScreen.style.display = 'flex';
+    welcomeScreen.style.alignItems = 'center';
+    welcomeScreen.style.justifyContent = 'center';
+}
+
+// Mostrar contenido después del tiempo establecido
+setTimeout(() => {
+    mostrarContenidoPrincipal();
+}, tiempoEspera);
+
+// También ocultar si el usuario hace clic en la pantalla (opcional)
+if (welcomeScreen) {
+    welcomeScreen.addEventListener('click', function() {
+        mostrarContenidoPrincipal();
+    });
+}

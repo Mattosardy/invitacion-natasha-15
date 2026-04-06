@@ -430,7 +430,6 @@ body::before {
     display: none;
 }
 
-/* ========== RESPONSIVE CELULAR ========== */
 @media (max-width: 550px) {
     .content {
         padding: 12px 10px;
@@ -486,30 +485,48 @@ body::before {
         font-size: 0.85em;
     }
     
-    .detail-chip {
-        font-size: 0.55em;
-        padding: 3px 6px;
-    }
-    
-    .map-btn-compact {
-        font-size: 0.5em;
-        padding: 4px;
-    }
-    
-    .bottom-three-columns {
+    /* CORRECCIÓN: Columnas en horizontal también en celular */
+    .bottom-two-columns {
+        flex-direction: row !important;
+        flex-wrap: wrap;
         gap: 6px;
     }
     
-    .info-text {
+    .column-left, .column-center, .column-right {
+        flex: 1;
+        min-width: 100px;
+    }
+    
+    /* En celular muy pequeño, que se pongan una abajo de la otra */
+    @media (max-width: 450px) {
+        .bottom-two-columns {
+            flex-direction: column !important;
+        }
+        
+        .column-left, .column-center, .column-right {
+            width: 100%;
+        }
+    }
+    
+    .vestimenta-box, .obsequios-box {
+        padding: 6px 4px;
+    }
+    
+    .vestimenta-box .info-text, .obsequios-box .info-text {
         font-size: 0.55em;
     }
     
-    .info-text strong {
+    .vestimenta-box .info-text strong, .obsequios-box .info-text strong {
         font-size: 0.6em;
     }
     
     .account-number {
-        font-size: 0.75em;
+        font-size: 0.7em;
+    }
+    
+    .map-btn-compact {
+        font-size: 0.55em;
+        padding: 4px;
     }
     
     .gothic-corner {
@@ -519,29 +536,6 @@ body::before {
     
     .gothic-border {
         height: 8px;
-    }
-}
-
-@media (max-width: 380px) {
-    .empty-space {
-        height: 25vh;
-    }
-    
-    .title {
-        font-size: 1.3em;
-    }
-    
-    .time-box {
-        min-width: 28px;
-    }
-    
-    .time-box span:first-child {
-        font-size: 0.7em;
-    }
-    
-    .detail-chip {
-        font-size: 0.5em;
-        padding: 2px 5px;
     }
 }
 /* ========================================== */
@@ -642,4 +636,139 @@ body::before {
     .welcome-small {
         font-size: 0.8em;
     }
+}
+/* ========================================== */
+/* PANTALLA DE BIENVENIDA - VERSIÓN MEJORADA */
+/* ========================================== */
+.welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: opacity 1s ease-out;
+}
+
+.welcome-screen.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.welcome-text {
+    text-align: center;
+    animation: pulseGlow 2s ease-in-out infinite;
+    padding: 20px;
+}
+
+.welcome-small {
+    color: #e94560;
+    font-size: 1.2em;
+    letter-spacing: 3px;
+    font-family: monospace;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(233,69,96,0.5);
+}
+
+.welcome-big {
+    color: #8B0000;
+    font-size: 2.8em;
+    font-weight: bold;
+    letter-spacing: 5px;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 15px rgba(139,0,0,0.5);
+}
+
+/* CONTENIDO PRINCIPAL */
+.main-content {
+    transition: opacity 1.5s ease-in;
+}
+
+.main-content.hidden {
+    opacity: 0;
+    visibility: hidden;
+    display: none;
+}
+
+.main-content.visible {
+    opacity: 1;
+    visibility: visible;
+    display: block;
+}
+
+/* Responsive celular */
+@media (max-width: 550px) {
+    .welcome-small {
+        font-size: 1em;
+        letter-spacing: 2px;
+    }
+    
+    .welcome-big {
+        font-size: 2em;
+        letter-spacing: 3px;
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.7; text-shadow: 0 0 5px rgba(233,69,96,0.3); }
+    50% { opacity: 1; text-shadow: 0 0 20px rgba(233,69,96,0.8); }
+    // ==========================================
+// INTENTAR REPRODUCIR MÚSICA AUTOMÁTICAMENTE
+// ==========================================
+const musica = document.getElementById('bgMusic');
+const botonMusica = document.getElementById('musicToggle');
+let musicaActiva = false;
+
+function intentarReproducirMusica() {
+    if (musica) {
+        musica.play().then(() => {
+            musicaActiva = true;
+            if (botonMusica) botonMusica.textContent = '🔇 SILENCIAR';
+            console.log('🎵 Música reproduciéndose automáticamente');
+        }).catch(error => {
+            console.log('🎵 Autoplay bloqueado por el navegador:', error);
+            if (botonMusica) botonMusica.textContent = '🎵 ACTIVAR MÚSICA';
+            // Mostrar mensaje suave
+            setTimeout(() => {
+                mostrarMensaje('🎵 Toca el botón de música para activar el sonido', 'error');
+            }, 1000);
+        });
+    }
+}
+
+// Reemplazar la función controlarMusica existente
+function controlarMusica() {
+    if (musicaActiva) {
+        musica.pause();
+        botonMusica.textContent = '🎵 ACTIVAR MÚSICA';
+        musicaActiva = false;
+    } else {
+        musica.play().then(() => {
+            botonMusica.textContent = '🔇 SILENCIAR';
+            musicaActiva = true;
+        }).catch(() => {
+            mostrarMensaje('🎵 Haz clic en la página para activar la música', 'error');
+        });
+    }
+}
+
+// Intentar reproducir música al cargar la página
+document.addEventListener('click', function unaVez() {
+    intentarReproducirMusica();
+    document.removeEventListener('click', unaVez);
+}, { once: true });
+
+// También intentar al mostrar el contenido principal
+setTimeout(() => {
+    intentarReproducirMusica();
+}, 3000);
+
+// Asignar evento al botón
+if (botonMusica) {
+    botonMusica.addEventListener('click', controlarMusica);
 }
