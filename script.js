@@ -41,15 +41,14 @@ function normalizar(texto) {
 // ============================================
 async function verificarNombreEnDB(nombre) {
     try {
-        const response = await fetch(`${APPS_SCRIPT_URL}?action=listar`);
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=listar&t=${Date.now()}`);
         const data = await response.json();
+        console.log('📋 Datos recibidos:', data);
+        console.log('🔍 Buscando nombre exacto:', nombre);
         
-        const nombreNormalizado = normalizar(nombre);
-        
-        const encontrado = data.find(inv => {
-            const nombreSheet = normalizar(inv.nombre || "");
-            return nombreSheet === nombreNormalizado;
-        });
+        // Comparación exacta (sin normalizar)
+        const encontrado = data.find(inv => inv.nombre === nombre);
+        console.log('✅ Resultado búsqueda:', encontrado);
         
         return encontrado || null;
     } catch (error) {
