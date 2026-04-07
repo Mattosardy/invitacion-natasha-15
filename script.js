@@ -4,7 +4,7 @@
 // ============================================
 
 // Configuración de Google Apps Script (la URL la pegarás después)
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhQjxF8OUcUx1ouSMQMnrn-X6XtRhLKE0IhhazWve8uLw_9o1myIss0pzCgwEy0ty3/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5Y68DmOrXtvtNWqDIEwNA4vZ32n-R4ZDWSGwpsUcs9rL27sOCOMhOX8zkXk0JMs-V/exec";
 
 const confirmBtn = document.getElementById('confirmBtn');
 const guestNameInput = document.getElementById('guestName');
