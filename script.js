@@ -3,7 +3,6 @@
 // Confirmación por WhatsApp (versión simple)
 // ============================================
 
-// Número del administrador
 const ADMIN_PHONE = "+59891950107";
 
 const confirmBtn = document.getElementById('confirmBtn');
@@ -43,18 +42,13 @@ function verificarFechaLimite() {
 
 function confirmarAsistencia() {
     if (verificarFechaLimite()) return;
-    
     if (!nombreInvitado) {
         mostrarMensaje('❌ Acceso no válido. Usá el enlace que recibiste por WhatsApp.', 'error');
         return;
     }
-    
-    // Mensaje simple: solo "Confirmo" + nombre
     const mensaje = `✅ *CONFIRMO*%0a%0a¡Hola! ${nombreInvitado} confirma su asistencia a tus 15 años.`;
-    
     const url = `https://wa.me/${ADMIN_PHONE}?text=${mensaje}`;
     window.open(url, '_blank');
-    
     mostrarMensaje(`📱 Gracias ${nombreInvitado}. Se abrirá WhatsApp para enviar tu confirmación.`, 'success');
     confirmBtn.disabled = true;
 }
@@ -73,7 +67,6 @@ function actualizarCuentaRegresiva() {
     const fechaEvento = new Date('2026-06-13T22:00:00');
     const ahora = new Date();
     const diferencia = fechaEvento - ahora;
-    
     if (diferencia <= 0) {
         document.getElementById('days').textContent = '00';
         document.getElementById('hours').textContent = '00';
@@ -81,12 +74,10 @@ function actualizarCuentaRegresiva() {
         document.getElementById('seconds').textContent = '00';
         return;
     }
-    
     const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
     const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
     const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
-    
     document.getElementById('days').textContent = dias.toString().padStart(2, '0');
     document.getElementById('hours').textContent = horas.toString().padStart(2, '0');
     document.getElementById('minutes').textContent = minutos.toString().padStart(2, '0');
@@ -132,7 +123,6 @@ function controlarMusica() {
 
 function init() {
     nombreInvitado = obtenerNombreDeURL();
-    
     if (nombreInvitado) {
         guestNameDisplay.textContent = `🎸 ${nombreInvitado} 🎸`;
         guestNameInput.value = nombreInvitado;
@@ -146,7 +136,6 @@ function init() {
         if (accesoBanner) accesoBanner.style.display = 'block';
         mostrarMensaje('❌ Acceso no válido. Usá el enlace que recibiste por WhatsApp.', 'error');
     }
-    
     actualizarCuentaRegresiva();
     setInterval(actualizarCuentaRegresiva, 1000);
 }

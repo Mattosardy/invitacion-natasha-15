@@ -3,40 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    
     <title>🦇 Natasha - 15 Años | Ceremonia Gótica 🦇</title>
-    
     <meta name="description" content="🦇 Celebración gótica de los 15 años de Natasha. 13 de Junio 2026 - Nuevo Salón Azul">
     <meta property="og:title" content="🦇 Natasha - 15 Años | Ceremonia Gótica">
     <meta property="og:description" content="Celebración gótica de los 15 años de Natasha. 13 de Junio 2026 - Nuevo Salón Azul">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mattosardy.github.io/invitacion-natasha-15/">
     <meta property="og:image" content="https://mattosardy.github.io/invitacion-natasha-15/vista-previa.jpg">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- BANNER DE ACCESO NO VÁLIDO -->
     <div id="accesoInvalidoBanner" class="banner-acceso-invalido" style="display: none;">
-        ⚠️ ACCESO NO VÁLIDO ⚠️<br>
-        Usá el enlace que recibiste por WhatsApp.
+        ⚠️ ACCESO NO VÁLIDO ⚠️<br>Usá el enlace que recibiste por WhatsApp.
     </div>
-
     <div class="container">
         <div class="invitation-card">
-            
-            <!-- VIDEO DE FONDO -->
             <div class="bg-video-container">
                 <video id="bgVideo" class="bg-video" autoplay loop muted playsinline>
                     <source src="foto-natasha.mp4" type="video/mp4">
                 </video>
             </div>
-            
-            <!-- Elementos decorativos góticos ELIMINADOS -->
-            
             <div class="content">
-                
-                <!-- PANTALLA DE BIENVENIDA (7 segundos) -->
                 <div id="welcomeScreen" class="welcome-screen">
                     <div class="welcome-text">
                         <div class="welcome-small">✦ te invito a festejar ✦</div>
@@ -44,105 +31,62 @@
                         <div class="welcome-big">✦ ★ ✦</div>
                     </div>
                 </div>
-
-                <!-- CONTENIDO PRINCIPAL (oculto al inicio) -->
                 <div id="mainContent" class="main-content hidden">
-                    
-                    <!-- TÍTULO -->
                     <div class="title-section">
                         <div class="gothic-cross">†</div>
                         <div class="metal-band">✦ MIS 15 AÑOS ✦</div>
-                        <h1 class="title">✦ ★ ✦     NATASHA     ✦ ★ ✦</h1>
+                        <h1 class="title">✦ ★ ✦ NATASHA ✦ ★ ✦</h1>
                     </div>
-
-                    <!-- ESPACIO VACÍO CENTRAL -->
                     <div class="empty-space"></div>
-
-                    <!-- SECCIÓN UNIFICADA -->
                     <div class="action-section">
                         <div class="unified-box">
                             <div class="unified-row">
-                                <button id="confirmBtn" class="confirm-btn" disabled>
-                                    🦇 CONFIRMAR 🦇
-                                </button>
+                                <button id="confirmBtn" class="confirm-btn" disabled>🦇 CONFIRMAR 🦇</button>
                                 <div class="nombre-invitado-linea">
                                     <div id="guestNameDisplay" class="nombre-automatico-linea">🎸 Cargando...</div>
                                     <input type="hidden" id="guestName" readonly>
                                 </div>
                                 <div class="countdown-numbers">
                                     <div class="countdown-timer">
-                                        <div class="time-box">
-                                            <span id="days">00</span>
-                                            <span>d</span>
-                                        </div>
-                                        <div class="time-box">
-                                            <span id="hours">00</span>
-                                            <span>h</span>
-                                        </div>
-                                        <div class="time-box">
-                                            <span id="minutes">00</span>
-                                            <span>m</span>
-                                        </div>
-                                        <div class="time-box">
-                                            <span id="seconds">00</span>
-                                            <span>s</span>
-                                        </div>
+                                        <div class="time-box"><span id="days">00</span><span>d</span></div>
+                                        <div class="time-box"><span id="hours">00</span><span>h</span></div>
+                                        <div class="time-box"><span id="minutes">00</span><span>m</span></div>
+                                        <div class="time-box"><span id="seconds">00</span><span>s</span></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div id="message" class="message"></div>
                     </div>
-
-                    <!-- PARTE INFERIOR - TRES COLUMNAS -->
                     <div class="bottom-two-columns">
-                        <!-- COLUMNA IZQUIERDA: Vestimenta -->
                         <div class="column-left">
                             <div class="vestimenta-box">
                                 <span class="info-icon">🌹</span>
-                                <div class="info-text">
-                                     <span>Vestimenta negra Exclusiva para la 15añera</span>
-                                    
-                                </div>
+                                <div class="info-text"><span>Vestimenta negra Exclusiva para la 15añera</span></div>
                             </div>
                         </div>
-                        
-                        <!-- COLUMNA CENTRAL: Ubicación y mapa -->
                         <div class="column-center">
                             <div class="event-details-compact">
-                                <a href="https://maps.app.goo.gl/LX1qvkwKApb9qiAA6" target="_blank" class="map-btn-compact">
-                                    🕷️Salón Azul J. Belloni 3342 📍VER UBICACIÓN🕷️
-                                </a>
+                                <a href="https://maps.app.goo.gl/LX1qvkwKApb9qiAA6" target="_blank" class="map-btn-compact">🕷️Salón Azul J. Belloni 3342 📍VER UBICACIÓN🕷️</a>
                             </div>
                         </div>
-                        
-                        <!-- COLUMNA DERECHA: Obsequios -->
                         <div class="column-right">
                             <div class="obsequios-box">
                                 <span class="info-icon">👑 🎁</span>
-                                <div class="info-text">
-                                    <strong>Obsequios:</strong>
-                                    <span>cuenta mi dinero 3701052530</span>
-                                    
-                                </div>
+                                <div class="info-text"><strong>Obsequios:</strong><span>cuenta mi dinero 3701052530</span></div>
                             </div>
                         </div>
                     </div>
-                    
-                </div> <!-- FIN mainContent -->
-            </div> <!-- FIN content -->
-        </div> <!-- FIN invitation-card -->
-    </div> <!-- FIN container -->
-
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="music-control">
         <button id="musicToggle" class="music-btn">🌙 ACTIVAR MÚSICA 🌙</button>
     </div>
-
     <audio id="bgMusic" loop>
         <source src="musica-natasha.mp3" type="audio/mpeg">
     </audio>
-
     <script src="script.js"></script>
-    <script src="script.js?v=2"></script>
 </body>
 </html>

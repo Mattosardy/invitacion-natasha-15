@@ -121,14 +121,13 @@
         td {
             padding: 12px;
             border-bottom: 1px solid rgba(233,69,96,0.3);
-            color: #e0e0e0;
         }
-        .confirmado {
-            color: #00ff00;
+        .nombre-pendiente {
+            color: #e94560;
             font-weight: bold;
         }
-        .pendiente {
-            color: #e94560;
+        .nombre-confirmado {
+            color: #00ff00;
             font-weight: bold;
         }
         .send-invite-btn {
@@ -144,21 +143,6 @@
         .send-invite-btn:hover {
             transform: scale(1.02);
             box-shadow: 0 0 8px rgba(37,211,102,0.5);
-        }
-        .confirm-manual-btn {
-            background: #00a8ff;
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.7em;
-            font-weight: bold;
-            margin-left: 5px;
-        }
-        .confirm-manual-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 8px rgba(0,168,255,0.5);
         }
         .export-btn {
             width: 100%;
@@ -199,7 +183,7 @@
             th, td { font-size: 0.7em; padding: 8px; }
             .form-agregar { flex-direction: column; }
             .stats { flex-direction: column; }
-            .send-invite-btn, .confirm-manual-btn { padding: 4px 8px; font-size: 0.6em; }
+            .send-invite-btn { padding: 4px 8px; font-size: 0.6em; }
         }
     </style>
 </head>
@@ -208,7 +192,6 @@
         <div class="admin-card">
             <h1>🎸 PANEL DE CONTROL 🎸</h1>
             <div class="subtitle">Lista de invitados - 15 años Natasha</div>
-
             <div class="stats">
                 <div class="stat-box">
                     <div class="stat-number" id="totalInvitados">0</div>
@@ -227,7 +210,6 @@
                     <div class="stat-label">Pendientes</div>
                 </div>
             </div>
-
             <div class="form-agregar">
                 <input type="text" id="newNombre" placeholder="Nombre completo">
                 <input type="tel" id="newTelefono" placeholder="Teléfono (ej: 091950107)">
@@ -242,35 +224,24 @@
                 </select>
                 <button id="agregarBtn">➕ Agregar</button>
             </div>
-
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre o teléfono...">
             </div>
-
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
-                        <tr><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr>
+                        <tr><th>Nombre</th><th>Teléfono</th><th>Acción</th></tr>
                     </thead>
                     <tbody id="invitadosList"></tbody>
                 </table>
             </div>
-
             <button class="export-btn" id="exportBtn">📥 Exportar lista a Excel</button>
             <button class="reset-btn" id="resetBtn">🔄 RESTABLECER LISTA COMPLETA</button>
         </div>
     </div>
-
     <script>
-        // ==========================================
-        // CONFIGURACIÓN
-        // ==========================================
         const STORAGE_KEY = 'listaInvitadosNatasha';
         let listaInvitados = [];
-
-        // ==========================================
-        // LISTA DE INVITADOS
-        // ==========================================
         const invitadosIniciales = [
             { nombre: "prueba_uno", telefono: "99999999", cantidad: 1, confirmado: false, fechaConfirmacion: null },
             { nombre: "Estrella_Alvarez", telefono: "98036490", cantidad: 2, confirmado: false, fechaConfirmacion: null },
@@ -313,136 +284,62 @@
             { nombre: "Valentina_Maquiola", telefono: "94214501", cantidad: 1, confirmado: false, fechaConfirmacion: null },
             { nombre: "Felipe_Guzman", telefono: "93500221", cantidad: 1, confirmado: false, fechaConfirmacion: null }
         ];
-
-        function guardarListaLocal() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados));
-        }
-
+        function guardarListaLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados)); }
         function cargarLista() {
             const guardada = localStorage.getItem(STORAGE_KEY);
-            if (guardada) {
-                listaInvitados = JSON.parse(guardada);
-                actualizarTabla();
-            } else {
-                listaInvitados = JSON.parse(JSON.stringify(invitadosIniciales));
-                guardarListaLocal();
-                actualizarTabla();
-            }
+            if (guardada) { listaInvitados = JSON.parse(guardada); actualizarTabla(); }
+            else { listaInvitados = JSON.parse(JSON.stringify(invitadosIniciales)); guardarListaLocal(); actualizarTabla(); }
         }
-
-        function marcarConfirmado(index) {
-            const invitado = listaInvitados[index];
-            if (confirm(`¿Marcar a "${invitado.nombre}" como CONFIRMADO?`)) {
-                invitado.confirmado = true;
-                invitado.fechaConfirmacion = new Date().toISOString();
-                guardarListaLocal();
-                actualizarTabla();
-                alert(`✅ ${invitado.nombre} marcado como confirmado`);
-            }
-        }
-
         function enviarInvitacionPorWhatsApp(index) {
             const invitado = listaInvitados[index];
             if (!invitado) return;
-            
             const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${invitado.nombre}`;
-            
-            const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0a` +
-                `📅 *Fecha:* Sábado 13 de Junio 2026%0a` +
-                `🕗 *Hora:* 22:00 a 05:00%0a` +
-                `📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a` +
-                `👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a` +
-                `🔗 *Confirmá tu asistencia acá:*%0a${enlace}%0a%0a` +
-                `¡Te esperamos! 🎉`;
-            
-            const url = `https://wa.me/${invitado.telefono}?text=${mensaje}`;
-            window.open(url, '_blank');
+            const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0a${enlace}%0a%0a¡Te esperamos! 🎉`;
+            window.open(`https://wa.me/${invitado.telefono}?text=${mensaje}`, '_blank');
         }
-
         function agregarInvitado() {
             const nombre = document.getElementById('newNombre').value.trim();
             const telefono = document.getElementById('newTelefono').value.trim();
             const cantidad = parseInt(document.getElementById('newCantidad').value);
-            
-            if (!nombre || !telefono) {
-                alert('Completá nombre y teléfono');
-                return;
-            }
-            
-            listaInvitados.push({
-                nombre: nombre,
-                telefono: telefono,
-                cantidad: cantidad,
-                confirmado: false,
-                fechaConfirmacion: null
-            });
-            guardarListaLocal();
-            actualizarTabla();
-            
-            document.getElementById('newNombre').value = '';
-            document.getElementById('newTelefono').value = '';
+            if (!nombre || !telefono) { alert('Completá nombre y teléfono'); return; }
+            listaInvitados.push({ nombre, telefono, cantidad, confirmado: false, fechaConfirmacion: null });
+            guardarListaLocal(); actualizarTabla();
+            document.getElementById('newNombre').value = ''; document.getElementById('newTelefono').value = '';
             alert(`✅ ${nombre} agregado correctamente`);
         }
-
         function actualizarTabla() {
-            const searchInput = document.getElementById('searchInput');
-            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-            
-            const filtrados = listaInvitados.filter(i => 
-                i.nombre.toLowerCase().includes(searchTerm) || 
-                i.telefono.includes(searchTerm)
-            );
-            
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtrados = listaInvitados.filter(i => i.nombre.toLowerCase().includes(searchTerm) || i.telefono.includes(searchTerm));
             const tbody = document.getElementById('invitadosList');
             if (!tbody) return;
-            
-            if (filtrados.length === 0) {
-                tbody.innerHTML = '<td><td colspan="4" style="text-align:center">No hay invitados</td</tr>';
-            } else {
+            if (filtrados.length === 0) { tbody.innerHTML = '<td><td colspan="3" style="text-align:center">No hay invitados</td</tr>'; }
+            else {
                 tbody.innerHTML = filtrados.map((inv, idx) => {
                     const originalIndex = listaInvitados.findIndex(i => i === inv);
-                    const fecha = inv.fechaConfirmacion ? new Date(inv.fechaConfirmacion).toLocaleString() : '-';
                     const mostrarNombre = inv.cantidad > 1 ? `${inv.nombre} +${inv.cantidad - 1}` : inv.nombre;
-                    const estadoTexto = inv.confirmado ? '✅ CONFIRMADO' : '⏳ PENDIENTE';
-                    const estadoClase = inv.confirmado ? 'confirmado' : 'pendiente';
-                    
+                    const nombreClase = inv.confirmado ? 'nombre-confirmado' : 'nombre-pendiente';
                     return `
                         <tr>
-                            <td>${mostrarNombre} <span class="cantidad-badge">${inv.cantidad} pers</span></td>
-                            <td>${inv.telefono}</td>
-                            <td class="${estadoClase}">
-                                ${estadoTexto}
-                                ${inv.confirmado ? `<br><small>${fecha}</small>` : ''}
-                            </td>
-                            <td>
-                                ${!inv.confirmado ? `
-                                    <button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})">📲 Invitar</button>
-                                    <button class="confirm-manual-btn" onclick="marcarConfirmado(${originalIndex})">✅ Marcar confirmado</button>
-                                ` : '—'}
-                               
-                            </td>
+                            <td class="${nombreClase}">${mostrarNombre} <span class="cantidad-badge">${inv.cantidad} pers</span></td>
+                            <td>${inv.telefono || '-'}</td>
+                            <td><button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})">📲 Invitar</button></td>
                         </tr>
                     `;
                 }).join('');
             }
-
-            const totalInvitadosSpan = document.getElementById('totalInvitados');
-            const totalPersonasSpan = document.getElementById('totalPersonas');
-            const totalConfirmadosSpan = document.getElementById('totalConfirmados');
-            const totalPendientesSpan = document.getElementById('totalPendientes');
-            
-            if (totalInvitadosSpan) totalInvitadosSpan.textContent = listaInvitados.length;
-            if (totalPersonasSpan) totalPersonasSpan.textContent = listaInvitados.reduce((sum, inv) => sum + inv.cantidad, 0);
+            const total = listaInvitados.length;
+            const totalPersonas = listaInvitados.reduce((s, i) => s + i.cantidad, 0);
             const confirmados = listaInvitados.filter(i => i.confirmado).length;
-            if (totalConfirmadosSpan) totalConfirmadosSpan.textContent = confirmados;
-            if (totalPendientesSpan) totalPendientesSpan.textContent = listaInvitados.length - confirmados;
+            document.getElementById('totalInvitados').textContent = total;
+            document.getElementById('totalPersonas').textContent = totalPersonas;
+            document.getElementById('totalConfirmados').textContent = confirmados;
+            document.getElementById('totalPendientes').textContent = total - confirmados;
         }
-
         function exportarExcel() {
-            let csv = "Nombre,Teléfono,Cantidad Personas,Estado,Fecha Confirmación\n";
+            let csv = "Nombre,Teléfono,Cantidad Personas,Estado\n";
             listaInvitados.forEach(i => {
-                const nombreMostrar = i.cantidad > 1 ? `${i.nombre} +${i.cantidad - 1}` : i.nombre;
-                csv += `"${nombreMostrar}","${i.telefono}",${i.cantidad},${i.confirmado ? "CONFIRMADO" : "PENDIENTE"},"${i.fechaConfirmacion || ''}"\n`;
+                const n = i.cantidad > 1 ? `${i.nombre} +${i.cantidad - 1}` : i.nombre;
+                csv += `"${n}","${i.telefono}",${i.cantidad},${i.confirmado ? "CONFIRMADO" : "PENDIENTE"}\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], {type: "text/csv;charset=utf-8;"});
             const link = document.createElement("a");
@@ -450,27 +347,18 @@
             link.download = "invitados_natasha.csv";
             link.click();
         }
-
         function restablecerLista() {
             if (confirm('⚠️ ¿Restablecer la lista? Se perderán los cambios manuales.')) {
                 listaInvitados = JSON.parse(JSON.stringify(invitadosIniciales));
-                guardarListaLocal();
-                actualizarTabla();
+                guardarListaLocal(); actualizarTabla();
                 alert('✅ Lista restablecida');
             }
         }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const agregarBtn = document.getElementById('agregarBtn');
-            const searchInput = document.getElementById('searchInput');
-            const exportBtn = document.getElementById('exportBtn');
-            const resetBtn = document.getElementById('resetBtn');
-
-            if (agregarBtn) agregarBtn.addEventListener('click', agregarInvitado);
-            if (searchInput) searchInput.addEventListener('input', actualizarTabla);
-            if (exportBtn) exportBtn.addEventListener('click', exportarExcel);
-            if (resetBtn) resetBtn.addEventListener('click', restablecerLista);
-            
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('agregarBtn').addEventListener('click', agregarInvitado);
+            document.getElementById('searchInput').addEventListener('input', actualizarTabla);
+            document.getElementById('exportBtn').addEventListener('click', exportarExcel);
+            document.getElementById('resetBtn').addEventListener('click', restablecerLista);
             cargarLista();
         });
     </script>
