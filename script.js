@@ -1,10 +1,10 @@
 // ============================================
 // INVITACIÓN 15 AÑOS - NATASHA
-// Con integración a Google Apps Script
+// Confirmación por WhatsApp (sin CORS)
 // ============================================
 
-// Configuración de Google Apps Script (la URL la pegarás después)
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyinle5oXCJuLBNuZrOkmwKFrsL0dOvrN1aoSWh9MWycy40FnnM_YEH6vJ0ZfDQI3cs/exec";
+// Configuración
+const numeroAdmin = "+59891950107"; // Número del administrador
 
 const confirmBtn = document.getElementById('confirmBtn');
 const guestNameInput = document.getElementById('guestName');
@@ -23,62 +23,6 @@ function obtenerNombreDeURL() {
     const urlParams = new URLSearchParams(window.location.search);
     const nombre = urlParams.get('nombre');
     return nombre ? decodeURIComponent(nombre) : null;
-}
-
-// ============================================
-// FUNCIÓN PARA NORMALIZAR TEXTOS (ignorar tildes, mayúsculas, espacios)
-// ============================================
-function normalizar(texto) {
-    return texto
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .trim()
-        .replace(/\s+/g, ' ');
-}
-
-// ============================================
-// VERIFICAR QUE EL NOMBRE ESTÉ EN LA BASE DE DATOS
-// ============================================
-async function verificarNombreEnDB(nombre) {
-    try {
-        const response = await fetch(`${APPS_SCRIPT_URL}?action=listar&t=${Date.now()}`);
-        const data = await response.json();
-        console.log('📋 Datos recibidos:', data);
-        console.log('🔍 Buscando nombre exacto:', nombre);
-        
-        // Comparación exacta (sin normalizar)
-        const encontrado = data.find(inv => inv.nombre === nombre);
-        console.log('✅ Resultado búsqueda:', encontrado);
-        
-        return encontrado || null;
-    } catch (error) {
-        console.error('Error verificando:', error);
-        return null;
-    }
-}
-
-// ============================================
-// GUARDAR CONFIRMACIÓN
-// ============================================
-async function guardarConfirmacion(nombre) {
-    try {
-        const response = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'confirmar',
-                nombre: nombre,
-                fecha: new Date().toISOString()
-            })
-        });
-        
-        const resultado = await response.json();
-        console.log('Respuesta:', resultado);
-        return resultado.success === true;
-    } catch (error) {
-        console.error('Error guardando:', error);
-        return false;
-    }
 }
 
 // ============================================
@@ -123,9 +67,9 @@ function verificarFechaLimite() {
 }
 
 // ============================================
-// CONFIRMAR ASISTENCIA
+// CONFIRMAR ASISTENCIA (Vía WhatsApp)
 // ============================================
-async function confirmarAsistencia() {
+function confirmarAsistencia() {
     if (verificarFechaLimite()) return;
     
     if (!nombreInvitado) {
@@ -133,45 +77,22 @@ async function confirmarAsistencia() {
         return;
     }
     
-    const yaConfirmoLocal = invitados.some(invitado => invitado.nombre.toLowerCase() === nombreInvitado.toLowerCase());
-    if (yaConfirmoLocal) {
-        mostrarMensaje('✅ Ya confirmaste tu asistencia. ¡Te esperamos!', 'error');
-        return;
-    }
+    // Crear mensaje para WhatsApp
+    const mensaje = `🎉 *CONFIRMACIÓN DE ASISTENCIA* 🎉%0a%0a` +
+        `*Nombre:* ${nombreInvitado}%0a` +
+        `*Fecha y hora:* ${new Date().toLocaleString()}%0a%0a` +
+        `✅ *¡${nombreInvitado} ha confirmado su asistencia!*%0a%0a` +
+        `📋 *Admin:* https://mattosardy.github.io/invitacion-natasha-15/admin.html`;
     
-    mostrarMensaje('🔄 Verificando...', 'success');
+    // Abrir WhatsApp
+    const url = `https://wa.me/${numeroAdmin}?text=${mensaje}`;
+    window.open(url, '_blank');
     
-    try {
-        const invitadoEnDB = await verificarNombreEnDB(nombreInvitado);
-        
-        if (!invitadoEnDB) {
-            mostrarMensaje('❌ Lo sentimos, tu nombre no está en la lista de invitados.', 'error');
-            return;
-        }
-        
-        if (invitadoEnDB.confirmado === "SI") {
-            mostrarMensaje('✅ Ya confirmaste tu asistencia anteriormente. ¡Te esperamos!', 'error');
-            return;
-        }
-        
-        const guardado = await guardarConfirmacion(nombreInvitado);
-        
-        if (guardado) {
-            invitados.push({
-                nombre: nombreInvitado,
-                fecha: new Date().toISOString()
-            });
-            localStorage.setItem('invitadosFiesta', JSON.stringify(invitados));
-            mostrarMensaje(`🎉 ¡Gracias ${nombreInvitado}! Has confirmado tu asistencia. ¡Te esperamos! 🎉`, 'success');
-            confirmBtn.disabled = true;
-        } else {
-            mostrarMensaje('❌ Error al guardar la confirmación. Intentá de nuevo.', 'error');
-        }
-        
-    } catch (error) {
-        console.error('Error general:', error);
-        mostrarMensaje('❌ Error de conexión. Revisá tu internet.', 'error');
-    }
+    // Mostrar mensaje al invitado
+    mostrarMensaje(`📱 Gracias ${nombreInvitado}. Se abrirá WhatsApp para enviar tu confirmación.`, 'success');
+    
+    // Deshabilitar el botón para evitar múltiples envíos
+    confirmBtn.disabled = true;
 }
 
 // ============================================
@@ -297,4 +218,4 @@ setTimeout(() => {
     mostrarContenidoPrincipal();
 }, tiempoEspera);
 
-console.log('✅ Invitación lista con Google Apps Script');
+console.log('✅ Invitación lista - Confirmación por WhatsApp');
