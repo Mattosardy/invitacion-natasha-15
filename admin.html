@@ -269,7 +269,7 @@
         let listaInvitados = [];
 
         // ==========================================
-        // LISTA DE INVITADOS (40 invitados con guiones bajos)
+        // LISTA DE INVITADOS (con guiones bajos)
         // ==========================================
         const invitadosIniciales = [
             { nombre: "prueba_uno", telefono: "99999999", cantidad: 1, confirmado: false, fechaConfirmacion: null },
@@ -314,13 +314,25 @@
             { nombre: "Felipe_Guzman", telefono: "93500221", cantidad: 1, confirmado: false, fechaConfirmacion: null }
         ];
 
+        // Forzar limpieza de localStorage si hay versión vieja
+        function forzarLimpieza() {
+            const version = localStorage.getItem('version_lista');
+            if (version !== '3') {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.setItem('version_lista', '3');
+                console.log('🗑️ Lista reiniciada a versión con guiones bajos');
+                return true;
+            }
+            return false;
+        }
+
         function guardarListaLocal() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados));
         }
 
         function cargarLista() {
             const guardada = localStorage.getItem(STORAGE_KEY);
-            if (guardada) {
+            if (guardada && !forzarLimpieza()) {
                 listaInvitados = JSON.parse(guardada);
                 actualizarTabla();
             } else {
@@ -336,6 +348,7 @@
             
             if (nombreConfirmar) {
                 const nombreDecodificado = decodeURIComponent(nombreConfirmar);
+                console.log('🔍 Buscando para confirmar:', nombreDecodificado);
                 const index = listaInvitados.findIndex(inv => inv.nombre === nombreDecodificado);
                 
                 if (index !== -1 && !listaInvitados[index].confirmado) {
@@ -349,7 +362,7 @@
                     alert(`ℹ️ ${listaInvitados[index].nombre} ya estaba confirmado.`);
                     window.history.replaceState({}, document.title, window.location.pathname);
                 } else {
-                    alert(`❌ No se encontró "${nombreDecodificado}" en la lista.`);
+                    alert(`❌ No se encontró "${nombreDecodificado}" en la lista.\n\nNombres disponibles:\n${listaInvitados.map(i => i.nombre).join(', ')}`);
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }
@@ -371,6 +384,8 @@
             if (!invitado) return;
             
             const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${invitado.nombre}`;
+            console.log('📲 Enlace generado:', enlace);
+            
             const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0a` +
                 `📅 *Fecha:* Sábado 13 de Junio 2026%0a` +
                 `🕗 *Hora:* 22:00 a 05:00%0a` +
