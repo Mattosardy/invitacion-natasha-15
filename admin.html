@@ -145,6 +145,21 @@
             transform: scale(1.02);
             box-shadow: 0 0 8px rgba(37,211,102,0.5);
         }
+        .confirm-manual-btn {
+            background: #00a8ff;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .confirm-manual-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 8px rgba(0,168,255,0.5);
+        }
         .export-btn {
             width: 100%;
             padding: 12px;
@@ -184,7 +199,7 @@
             th, td { font-size: 0.7em; padding: 8px; }
             .form-agregar { flex-direction: column; }
             .stats { flex-direction: column; }
-            .send-invite-btn { padding: 4px 8px; font-size: 0.6em; }
+            .send-invite-btn, .confirm-manual-btn { padding: 4px 8px; font-size: 0.6em; }
         }
     </style>
 </head>
@@ -235,7 +250,7 @@
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
-                        <tr><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Acción</th></tr>
+                        <tr><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
                     <tbody id="invitadosList"></tbody>
                 </table>
@@ -248,96 +263,84 @@
 
     <script>
         // ==========================================
-        // CONFIGURACIÓN - REEMPLAZÁ TU URL AQUÍ
+        // CONFIGURACIÓN
         // ==========================================
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyinle5oXCJuLBNuZrOkmwKFrsL0dOvrN1aoSWh9MWycy40FnnM_YEH6vJ0ZfDQI3cs/exec";
         const STORAGE_KEY = 'listaInvitadosNatasha';
         let listaInvitados = [];
 
         // ==========================================
-        // CARGAR LISTA DESDE APPS SCRIPT
+        // LISTA DE INVITADOS (40 invitados)
         // ==========================================
-        async function cargarLista() {
-            console.log('🔄 Cargando desde Apps Script...');
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=listar&t=${Date.now()}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                
-                if (data && data.length > 0) {
-                    listaInvitados = data.map(inv => ({
-                        nombre: inv.nombre,
-                        telefono: inv.telefono?.toString() || "",
-                        cantidad: parseInt(inv.cantidad_personas) || 1,
-                        confirmado: inv.confirmado === "SI",
-                        fechaConfirmacion: inv.fecha_confirmacion || null
-                    }));
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados));
-                    actualizarTabla();
-                    console.log('✅ Datos cargados desde Apps Script:', listaInvitados.length);
-                }
-            } catch (error) {
-                console.error('❌ Error cargando desde Apps Script:', error);
-                const guardada = localStorage.getItem(STORAGE_KEY);
-                if (guardada) {
-                    listaInvitados = JSON.parse(guardada);
-                    actualizarTabla();
-                    console.log('⚠️ Usando datos de localStorage');
-                }
+        const invitadosIniciales = [
+            { nombre: "prueba-uno", telefono: "99999999", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Estrella-Alvarez", telefono: "98036490", cantidad: 2, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Edardo-Melgarejo", telefono: "97155420", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Solange-Aguirre", telefono: "94633919", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Luis-Cardozo", telefono: "95624113", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Marta-Correa", telefono: "93774623", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Estela-Silva", telefono: "94342362", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Sandra-Chavez", telefono: "94611825", cantidad: 4, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Ana-Sastre", telefono: "95128887", cantidad: 4, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Jorge-Mederos", telefono: "98488813", cantidad: 3, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Andrea-Reynoso", telefono: "99301955", cantidad: 2, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Richard-Rodriguez", telefono: "94889342", cantidad: 3, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Matias-Arballo", telefono: "91950107", cantidad: 4, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Carolina-Gomez", telefono: "97105789", cantidad: 2, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Sebastian-Revello", telefono: "95002373", cantidad: 4, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Agustina-Laguna", telefono: "97044055", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Martina-Sosa", telefono: "93822793", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Avril-Giossi", telefono: "93821704", cantidad: 3, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Luana-Montero", telefono: "97139839", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Sophia-De-Almeida", telefono: "93894516", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Mahia-Larrosa", telefono: "97790304", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Kiara-Mazza", telefono: "96421850", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Julieta-Gamarra", telefono: "94416690", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Julieta-Ortiz", telefono: "91415835", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Victoria-Garrido", telefono: "97397058", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Oriana-Conde", telefono: "99169526", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Luana-Olivera", telefono: "98143558", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Ailem-Gonzalez", telefono: "95394799", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Melina-Leyes", telefono: "96884182", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Chelsea-Ifran", telefono: "98719332", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Sabrina-Soria", telefono: "92311391", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Byron-Arbelo", telefono: "92409688", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Aaron-Guevara", telefono: "97754583", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Ezequiel-Vazquez", telefono: "94213659", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Demian-Riguetti", telefono: "96098087", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Diego-Gutierrez", telefono: "98714294", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Luciana-Alvez", telefono: "97311165", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Valentina-Aguiar", telefono: "92281522", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Valentina-Maquiola", telefono: "94214501", cantidad: 1, confirmado: false, fechaConfirmacion: null },
+            { nombre: "Felipe-Guzman", telefono: "93500221", cantidad: 1, confirmado: false, fechaConfirmacion: null }
+        ];
+
+        function guardarListaLocal() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados));
+        }
+
+        function cargarLista() {
+            const guardada = localStorage.getItem(STORAGE_KEY);
+            if (guardada) {
+                listaInvitados = JSON.parse(guardada);
+                actualizarTabla();
+            } else {
+                listaInvitados = JSON.parse(JSON.stringify(invitadosIniciales));
+                guardarListaLocal();
+                actualizarTabla();
             }
         }
 
         // ==========================================
-        // AGREGAR INVITADO
+        // MARCAR CONFIRMADO MANUALMENTE
         // ==========================================
-        async function agregarInvitado() {
-            const nombreInput = document.getElementById('newNombre');
-            const telefonoInput = document.getElementById('newTelefono');
-            const cantidadSelect = document.getElementById('newCantidad');
-            
-            if (!nombreInput || !telefonoInput || !cantidadSelect) {
-                console.error('No se encontraron los elementos del formulario');
-                return;
-            }
-            
-            const nombre = nombreInput.value.trim();
-            const telefono = telefonoInput.value.trim();
-            const cantidad = parseInt(cantidadSelect.value);
-            
-            if (!nombre || !telefono) {
-                alert('Completá nombre y teléfono');
-                return;
-            }
-            
-            try {
-                const nuevoInvitado = {
-                    action: 'agregar',
-                    datos: {
-                        nombre: nombre,
-                        telefono: telefono,
-                        cantidad_personas: cantidad.toString()
-                    }
-                };
-                
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(nuevoInvitado)
-                });
-                
-                const resultado = await response.json();
-                
-                if (resultado.success) {
-                    alert(`✅ ${nombre} agregado correctamente`);
-                    nombreInput.value = '';
-                    telefonoInput.value = '';
-                    cargarLista();
-                } else {
-                    alert('❌ Error al agregar: ' + (resultado.message || ''));
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error de conexión');
+        function marcarConfirmado(index) {
+            const invitado = listaInvitados[index];
+            if (confirm(`¿Marcar a "${invitado.nombre}" como CONFIRMADO?`)) {
+                invitado.confirmado = true;
+                invitado.fechaConfirmacion = new Date().toISOString();
+                guardarListaLocal();
+                actualizarTabla();
+                alert(`✅ ${invitado.nombre} marcado como confirmado`);
             }
         }
 
@@ -348,11 +351,39 @@
             const invitado = listaInvitados[index];
             if (!invitado) return;
             
-            let nombreSimplificado = invitado.nombre.split(' y ')[0].split(' +')[0].replace(/\s+/g, '-');
-            const nombreCodificado = encodeURIComponent(nombreSimplificado);
-            const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${nombreCodificado}`;
+            const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${invitado.nombre}`;
             const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0aTe invito a celebrar mis 15 años.%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0a${enlace}%0a%0a¡Te esperamos! 🎉`;
-            window.open(`https://wa.me/${invitado.telefono}?text=${mensaje}`, '_blank');
+            
+            const url = `https://wa.me/${invitado.telefono}?text=${mensaje}`;
+            window.open(url, '_blank');
+        }
+
+        // ==========================================
+        // AGREGAR INVITADO
+        // ==========================================
+        function agregarInvitado() {
+            const nombre = document.getElementById('newNombre').value.trim();
+            const telefono = document.getElementById('newTelefono').value.trim();
+            const cantidad = parseInt(document.getElementById('newCantidad').value);
+            
+            if (!nombre || !telefono) {
+                alert('Completá nombre y teléfono');
+                return;
+            }
+            
+            listaInvitados.push({
+                nombre: nombre,
+                telefono: telefono,
+                cantidad: cantidad,
+                confirmado: false,
+                fechaConfirmacion: null
+            });
+            guardarListaLocal();
+            actualizarTabla();
+            
+            document.getElementById('newNombre').value = '';
+            document.getElementById('newTelefono').value = '';
+            alert(`✅ ${nombre} agregado correctamente`);
         }
 
         // ==========================================
@@ -371,22 +402,30 @@
             if (!tbody) return;
             
             if (filtrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No hay invitados</tr</tr>';
+                tbody.innerHTML = '<td><td colspan="4" style="text-align:center">No hay invitados</td</tr>';
             } else {
                 tbody.innerHTML = filtrados.map((inv, idx) => {
                     const originalIndex = listaInvitados.findIndex(i => i === inv);
                     const fecha = inv.fechaConfirmacion ? new Date(inv.fechaConfirmacion).toLocaleString() : '-';
                     const mostrarNombre = inv.cantidad > 1 ? `${inv.nombre} +${inv.cantidad - 1}` : inv.nombre;
+                    const estadoTexto = inv.confirmado ? '✅ CONFIRMADO' : '⏳ PENDIENTE';
+                    const estadoClase = inv.confirmado ? 'confirmado' : 'pendiente';
+                    
                     return `
                         <tr>
                             <td>${mostrarNombre} <span class="cantidad-badge">${inv.cantidad} pers</span></td>
                             <td>${inv.telefono}</td>
-                            <td class="${inv.confirmado ? 'confirmado' : 'pendiente'}">
-                                ${inv.confirmado ? '✅ CONFIRMADO' : '⏳ PENDIENTE'}
+                            <td class="${estadoClase}">
+                                ${estadoTexto}
                                 ${inv.confirmado ? `<br><small>${fecha}</small>` : ''}
                             </td>
-                            <td>${!inv.confirmado ? `<button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})">📲 Enviar invitación</button>` : '—'}</td>
-                        </tr>
+                            <td>
+                                ${!inv.confirmado ? `
+                                    <button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})">📲 Invitar</button>
+                                    <button class="confirm-manual-btn" onclick="marcarConfirmado(${originalIndex})">✅ Marcar confirmado</button>
+                                ` : '—'}
+                             </td>
+                         </tr>
                     `;
                 }).join('');
             }
@@ -420,17 +459,18 @@
         }
 
         function restablecerLista() {
-            if (confirm('⚠️ ¿Restablecer la lista? Se recargarán los datos desde Google Sheets.')) {
-                cargarLista();
+            if (confirm('⚠️ ¿Restablecer la lista? Se perderán los cambios manuales.')) {
+                listaInvitados = JSON.parse(JSON.stringify(invitadosIniciales));
+                guardarListaLocal();
+                actualizarTabla();
+                alert('✅ Lista restablecida');
             }
         }
 
         // ==========================================
-        // INICIALIZAR CUANDO EL DOM ESTÉ LISTO
+        // EVENTOS
         // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔧 Inicializando admin...');
-            
             const agregarBtn = document.getElementById('agregarBtn');
             const searchInput = document.getElementById('searchInput');
             const exportBtn = document.getElementById('exportBtn');
@@ -442,7 +482,6 @@
             if (resetBtn) resetBtn.addEventListener('click', restablecerLista);
             
             cargarLista();
-            setInterval(cargarLista, 5000);
         });
     </script>
 </body>
