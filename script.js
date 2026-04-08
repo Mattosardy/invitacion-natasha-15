@@ -3,8 +3,8 @@
 // Confirmación por WhatsApp (sin CORS)
 // ============================================
 
-// Configuración
-const numeroAdmin = "+59891950107"; // Número del administrador
+// Número del administrador (reemplazá con tu número)
+const ADMIN_PHONE = "+59891950107";
 
 const confirmBtn = document.getElementById('confirmBtn');
 const guestNameInput = document.getElementById('guestName');
@@ -34,22 +34,6 @@ function mostrarMensaje(texto, tipo) {
     setTimeout(() => {
         messageDiv.className = 'message';
     }, 4000);
-}
-
-// ============================================
-// ACTUALIZAR LISTA LOCAL
-// ============================================
-function actualizarListaLocal() {
-    if (!guestListElement) return;
-    if (invitados.length === 0) {
-        guestListElement.innerHTML = '<li style="text-align: center;">✨ Aún no hay confirmaciones ✨</li>';
-        return;
-    }
-    let html = '';
-    for (let i = 0; i < invitados.length; i++) {
-        html += `<li>✅ ${invitados[i].nombre}</li>`;
-    }
-    guestListElement.innerHTML = html;
 }
 
 // ============================================
@@ -85,7 +69,7 @@ function confirmarAsistencia() {
         `📋 *Admin:* https://mattosardy.github.io/invitacion-natasha-15/admin.html`;
     
     // Abrir WhatsApp
-    const url = `https://wa.me/${numeroAdmin}?text=${mensaje}`;
+    const url = `https://wa.me/${ADMIN_PHONE}?text=${mensaje}`;
     window.open(url, '_blank');
     
     // Mostrar mensaje al invitado
