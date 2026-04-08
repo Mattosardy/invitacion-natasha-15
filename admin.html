@@ -269,7 +269,7 @@
         let listaInvitados = [];
 
         // ==========================================
-        // LISTA DE INVITADOS (con guiones bajos)
+        // LISTA DE INVITADOS
         // ==========================================
         const invitadosIniciales = [
             { nombre: "prueba_uno", telefono: "99999999", cantidad: 1, confirmado: false, fechaConfirmacion: null },
@@ -314,57 +314,19 @@
             { nombre: "Felipe_Guzman", telefono: "93500221", cantidad: 1, confirmado: false, fechaConfirmacion: null }
         ];
 
-        // Forzar limpieza de localStorage si hay versión vieja
-        function forzarLimpieza() {
-            const version = localStorage.getItem('version_lista');
-            if (version !== '3') {
-                localStorage.removeItem(STORAGE_KEY);
-                localStorage.setItem('version_lista', '3');
-                console.log('🗑️ Lista reiniciada a versión con guiones bajos');
-                return true;
-            }
-            return false;
-        }
-
         function guardarListaLocal() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados));
         }
 
         function cargarLista() {
             const guardada = localStorage.getItem(STORAGE_KEY);
-            if (guardada && !forzarLimpieza()) {
+            if (guardada) {
                 listaInvitados = JSON.parse(guardada);
                 actualizarTabla();
             } else {
                 listaInvitados = JSON.parse(JSON.stringify(invitadosIniciales));
                 guardarListaLocal();
                 actualizarTabla();
-            }
-        }
-
-        function marcarConfirmadoDesdeURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const nombreConfirmar = urlParams.get('confirmar');
-            
-            if (nombreConfirmar) {
-                const nombreDecodificado = decodeURIComponent(nombreConfirmar);
-                console.log('🔍 Buscando para confirmar:', nombreDecodificado);
-                const index = listaInvitados.findIndex(inv => inv.nombre === nombreDecodificado);
-                
-                if (index !== -1 && !listaInvitados[index].confirmado) {
-                    listaInvitados[index].confirmado = true;
-                    listaInvitados[index].fechaConfirmacion = new Date().toISOString();
-                    guardarListaLocal();
-                    actualizarTabla();
-                    alert(`✅ ${listaInvitados[index].nombre} ha sido marcado como confirmado!`);
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                } else if (index !== -1 && listaInvitados[index].confirmado) {
-                    alert(`ℹ️ ${listaInvitados[index].nombre} ya estaba confirmado.`);
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                } else {
-                    alert(`❌ No se encontró "${nombreDecodificado}" en la lista.\n\nNombres disponibles:\n${listaInvitados.map(i => i.nombre).join(', ')}`);
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
             }
         }
 
@@ -384,7 +346,6 @@
             if (!invitado) return;
             
             const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${invitado.nombre}`;
-            console.log('📲 Enlace generado:', enlace);
             
             const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0a` +
                 `📅 *Fecha:* Sábado 13 de Junio 2026%0a` +
@@ -436,7 +397,7 @@
             if (!tbody) return;
             
             if (filtrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No hay invitados</tr</tr>';
+                tbody.innerHTML = '<td><td colspan="4" style="text-align:center">No hay invitados</td</tr>';
             } else {
                 tbody.innerHTML = filtrados.map((inv, idx) => {
                     const originalIndex = listaInvitados.findIndex(i => i === inv);
@@ -511,7 +472,6 @@
             if (resetBtn) resetBtn.addEventListener('click', restablecerLista);
             
             cargarLista();
-            marcarConfirmadoDesdeURL();
         });
     </script>
 </body>

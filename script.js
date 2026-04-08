@@ -1,9 +1,9 @@
 // ============================================
 // INVITACIÓN 15 AÑOS - NATASHA
-// Confirmación por WhatsApp
+// Confirmación por WhatsApp (versión simple)
 // ============================================
 
-// Número del administrador (solo él recibe los mensajes)
+// Número del administrador
 const ADMIN_PHONE = "+59891950107";
 
 const confirmBtn = document.getElementById('confirmBtn');
@@ -16,19 +16,12 @@ const accesoBanner = document.getElementById('accesoInvalidoBanner');
 let invitados = [];
 let nombreInvitado = null;
 
-// ============================================
-// LEER NOMBRE DE LA URL
-// ============================================
 function obtenerNombreDeURL() {
     const urlParams = new URLSearchParams(window.location.search);
     const nombre = urlParams.get('nombre');
-    console.log('🔍 Nombre desde URL:', nombre);
     return nombre ? decodeURIComponent(nombre) : null;
 }
 
-// ============================================
-// MOSTRAR MENSAJES
-// ============================================
 function mostrarMensaje(texto, tipo) {
     messageDiv.textContent = texto;
     messageDiv.className = `message ${tipo}`;
@@ -37,9 +30,6 @@ function mostrarMensaje(texto, tipo) {
     }, 4000);
 }
 
-// ============================================
-// VERIFICAR FECHA LÍMITE
-// ============================================
 function verificarFechaLimite() {
     const fechaLimite = new Date('2026-05-29T23:59:59');
     const ahora = new Date();
@@ -51,9 +41,6 @@ function verificarFechaLimite() {
     return false;
 }
 
-// ============================================
-// CONFIRMAR ASISTENCIA (Vía WhatsApp)
-// ============================================
 function confirmarAsistencia() {
     if (verificarFechaLimite()) return;
     
@@ -62,16 +49,8 @@ function confirmarAsistencia() {
         return;
     }
     
-    console.log('📨 Confirmando asistencia para:', nombreInvitado);
-    
-    const nombreParaEnlace = encodeURIComponent(nombreInvitado);
-    const enlaceConfirmacion = `https://mattosardy.github.io/invitacion-natasha-15/admin.html?confirmar=${nombreParaEnlace}`;
-    
-    const mensaje = `🎉 *CONFIRMACIÓN DE ASISTENCIA* 🎉%0a%0a` +
-        `*Nombre:* ${nombreInvitado}%0a` +
-        `*Fecha y hora:* ${new Date().toLocaleString()}%0a%0a` +
-        `✅ *¡${nombreInvitado} ha confirmado su asistencia!*%0a%0a` +
-        `🔗 *Hacé clic aquí para marcarlo como confirmado:*%0a${enlaceConfirmacion}`;
+    // Mensaje simple: solo "Confirmo" + nombre
+    const mensaje = `✅ *CONFIRMO*%0a%0a¡Hola! ${nombreInvitado} confirma su asistencia a tus 15 años.`;
     
     const url = `https://wa.me/${ADMIN_PHONE}?text=${mensaje}`;
     window.open(url, '_blank');
@@ -80,9 +59,6 @@ function confirmarAsistencia() {
     confirmBtn.disabled = true;
 }
 
-// ============================================
-// HABILITAR BOTÓN
-// ============================================
 function habilitarBoton() {
     const fechaLimite = new Date('2026-05-29T23:59:59');
     const ahora = new Date();
@@ -93,9 +69,6 @@ function habilitarBoton() {
     confirmBtn.disabled = false;
 }
 
-// ============================================
-// CUENTA REGRESIVA
-// ============================================
 function actualizarCuentaRegresiva() {
     const fechaEvento = new Date('2026-06-13T22:00:00');
     const ahora = new Date();
@@ -120,9 +93,6 @@ function actualizarCuentaRegresiva() {
     document.getElementById('seconds').textContent = segundos.toString().padStart(2, '0');
 }
 
-// ============================================
-// PANTALLA DE BIENVENIDA
-// ============================================
 const welcomeScreen = document.getElementById('welcomeScreen');
 const mainContent = document.getElementById('mainContent');
 
@@ -141,9 +111,6 @@ function mostrarContenidoPrincipal() {
     }
 }
 
-// ============================================
-// MÚSICA AUTOMÁTICA
-// ============================================
 let musicaActiva = false;
 const musica = document.getElementById('bgMusic');
 const botonMusica = document.getElementById('musicToggle');
@@ -163,9 +130,6 @@ function controlarMusica() {
     }
 }
 
-// ============================================
-// INICIALIZAR
-// ============================================
 function init() {
     nombreInvitado = obtenerNombreDeURL();
     
@@ -187,20 +151,15 @@ function init() {
     setInterval(actualizarCuentaRegresiva, 1000);
 }
 
-// ============================================
-// EVENTOS
-// ============================================
 if (confirmBtn) confirmBtn.addEventListener('click', confirmarAsistencia);
 if (botonMusica) botonMusica.addEventListener('click', controlarMusica);
 
-// Iniciar
 init();
 
-// Pantalla de bienvenida
 const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 const tiempoEspera = esMovil ? 5000 : 7000;
 setTimeout(() => {
     mostrarContenidoPrincipal();
 }, tiempoEspera);
 
-console.log('✅ Invitación lista - Confirmación por WhatsApp');
+console.log('✅ Invitación lista - Confirmación simple por WhatsApp');
