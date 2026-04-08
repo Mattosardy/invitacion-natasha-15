@@ -331,6 +331,33 @@
         }
 
         // ==========================================
+        // MARCAR CONFIRMADO DESDE URL (automático)
+        // ==========================================
+        function marcarConfirmadoDesdeURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const nombreConfirmar = urlParams.get('confirmar');
+            
+            if (nombreConfirmar) {
+                const index = listaInvitados.findIndex(inv => inv.nombre === nombreConfirmar);
+                
+                if (index !== -1 && !listaInvitados[index].confirmado) {
+                    listaInvitados[index].confirmado = true;
+                    listaInvitados[index].fechaConfirmacion = new Date().toISOString();
+                    guardarListaLocal();
+                    actualizarTabla();
+                    alert(`✅ ${nombreConfirmar} ha sido marcado como confirmado automáticamente!`);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else if (index !== -1 && listaInvitados[index].confirmado) {
+                    alert(`ℹ️ ${nombreConfirmar} ya estaba marcado como confirmado.`);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    alert(`❌ No se encontró a "${nombreConfirmar}" en la lista de invitados.`);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        }
+
+        // ==========================================
         // MARCAR CONFIRMADO MANUALMENTE
         // ==========================================
         function marcarConfirmado(index) {
@@ -424,8 +451,8 @@
                                     <button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})">📲 Invitar</button>
                                     <button class="confirm-manual-btn" onclick="marcarConfirmado(${originalIndex})">✅ Marcar confirmado</button>
                                 ` : '—'}
-                             </td>
-                         </tr>
+                              </td>
+                        </tr>
                     `;
                 }).join('');
             }
@@ -482,6 +509,7 @@
             if (resetBtn) resetBtn.addEventListener('click', restablecerLista);
             
             cargarLista();
+            marcarConfirmadoDesdeURL(); // <-- Esto marca automático desde el enlace
         });
     </script>
 </body>
