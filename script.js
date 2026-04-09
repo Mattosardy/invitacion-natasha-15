@@ -92,12 +92,8 @@ async function confirmar_asistencia() {
             mostrar_mensaje("❌ no se pudo registrar la confirmación", "error");
             return;
         }
-        mostrar_mensaje(`✅ gracias ${invitado_actual.nombre}, tu asistencia quedó confirmada`, "success");
-        // opcional: abrir whatsapp solo como mensaje complementario
-        const mensaje = `✅ *CONFIRMADO*%0a%0a¡Hola! ${invitado_actual.nombre} confirmó su asistencia a tus 15 años.`;
-        const url = `https://wa.me/${admin_phone}?text=${mensaje}`;
-        window.open(url, "_blank");
-    } catch (error) {
+        mostrar_mensaje("✅ Gracias, no faltes!! contigo ese día será especial!", "success");
+        } catch (error) {
         console.error("error al confirmar:", error);
         confirm_btn.disabled = false;
         mostrar_mensaje("❌ hubo un problema al confirmar", "error");
