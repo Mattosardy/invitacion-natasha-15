@@ -117,9 +117,9 @@ body::after {
 }
 
 .open-invitation-btn {
-    position: absolute;
+    position: fixed;
     left: 50%;
-    bottom: 24px;
+    bottom: 84px;
     transform: translateX(-50%);
     min-height: 50px;
     padding: 12px 26px;
@@ -137,10 +137,10 @@ body::after {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.25s ease;
-    z-index: 3;
+    z-index: 6;
 }
 
-.main-content.awaiting-open .open-invitation-btn {
+body.awaiting-open .open-invitation-btn {
     opacity: 1;
     pointer-events: auto;
     transform: translateX(-50%) translateY(0);
@@ -432,9 +432,19 @@ body::after {
 
 .music-control {
     position: fixed;
-    right: 18px;
+    left: 50%;
     bottom: 18px;
     z-index: 5;
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+body.awaiting-open .music-control {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
 }
 
 .music-btn {
@@ -558,7 +568,7 @@ body::after {
     }
 
     .open-invitation-btn {
-        bottom: 18px;
+        bottom: 70px;
         min-height: 44px;
         padding: 10px 20px;
         font-size: 0.68rem;
@@ -631,7 +641,7 @@ body::after {
     }
 
     .music-control {
-        right: 12px;
+        left: 50%;
         bottom: 12px;
     }
 

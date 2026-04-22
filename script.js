@@ -152,6 +152,7 @@ function mostrar_contenido_principal() {
         main_content.classList.add("visible");
         main_content.classList.remove("show-details");
         main_content.classList.add("awaiting-open");
+        document.body.classList.add("awaiting-open");
     }
 }
 
@@ -159,6 +160,7 @@ function abrir_invitacion() {
     if (!main_content) return;
     main_content.classList.remove("awaiting-open");
     main_content.classList.add("show-details");
+    document.body.classList.remove("awaiting-open");
 }
 
 function controlar_musica() {
