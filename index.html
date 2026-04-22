@@ -2,91 +2,112 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🦇 Natasha - 15 Años | Ceremonia Gótica 🦇</title>
-    <meta name="description" content="🦇 Celebración gótica de los 15 años de Natasha. 13 de Junio 2026 - Nuevo Salón Azul">
-    <meta property="og:title" content="🦇 Natasha - 15 Años | Ceremonia Gótica">
-    <meta property="og:description" content="Celebración gótica de los 15 años de Natasha. 13 de Junio 2026 - Nuevo Salón Azul">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natasha | Mis 15 A&ntilde;os</title>
+    <meta name="description" content="Celebraci&oacute;n de los 15 a&ntilde;os de Natasha. 13 de junio de 2026 en Sal&oacute;n Azul.">
+    <meta property="og:title" content="Natasha | Mis 15 A&ntilde;os">
+    <meta property="og:description" content="Celebraci&oacute;n de los 15 a&ntilde;os de Natasha. 13 de junio de 2026 en Sal&oacute;n Azul.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mattosardy.github.io/invitacion-natasha-15/">
     <meta property="og:image" content="https://mattosardy.github.io/invitacion-natasha-15/vista-previa.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="accesoInvalidoBanner" class="banner-acceso-invalido" style="display: none;">
-        ⚠️ ACCESO NO VÁLIDO ⚠️<br>Usá el enlace que recibiste por WhatsApp.
+        Acceso no v&aacute;lido. Us&aacute; el enlace que recibiste por WhatsApp.
     </div>
-    <div class="container">
-        <div class="invitation-card">
+
+    <div id="welcomeScreen" class="welcome-screen">
+        <div class="welcome-text">
+            <p class="welcome-kicker">Una noche para recordar</p>
+            <h1 class="welcome-title">Natasha</h1>
+            <p class="welcome-subtitle">te invita a celebrar sus 15 a&ntilde;os</p>
+        </div>
+    </div>
+
+    <main class="page-shell">
+        <section class="invitation-card">
             <div class="bg-video-container">
                 <video id="bgVideo" class="bg-video" autoplay loop muted playsinline>
                     <source src="foto-natasha.mp4" type="video/mp4">
                 </video>
             </div>
-            <div class="content">
-                <div id="welcomeScreen" class="welcome-screen">
-                    <div class="welcome-text">
-                        <div class="welcome-small">✦ te invito a festejar ✦</div>
-                        <div class="welcome-big">✦ ★ ✦ MIS 15 AÑOS ✦ ★ ✦</div>
-                        <div class="welcome-big">✦ ★ ✦</div>
-                    </div>
-                </div>
-                <div id="mainContent" class="main-content hidden">
-                    <div class="title-section">
-                        <div class="gothic-cross">†</div>
-                        <div class="metal-band">✦ MIS 15 AÑOS ✦</div>
-                        <h1 class="title">✦ ★ ✦ NATASHA ✦ ★ ✦</h1>
-                    </div>
-                    <div class="empty-space"></div>
-                    <div class="action-section">
-                        <div class="unified-box">
-                            <div class="unified-row">
-                                <button id="confirmBtn" class="confirm-btn" disabled>🦇 CONFIRMAR 🦇</button>
-                                <div class="nombre-invitado-linea">
-                                    <div id="guestNameDisplay" class="nombre-automatico-linea">🎸 Cargando...</div>
-                                    <input type="hidden" id="guestName" readonly>
-                                </div>
-                                <div class="countdown-numbers">
-                                    <div class="countdown-timer">
-                                        <div class="time-box"><span id="days">00</span><span>d</span></div>
-                                        <div class="time-box"><span id="hours">00</span><span>h</span></div>
-                                        <div class="time-box"><span id="minutes">00</span><span>m</span></div>
-                                        <div class="time-box"><span id="seconds">00</span><span>s</span></div>
-                                    </div>
-                                </div>
-                            </div>
+
+            <div class="media-overlay"></div>
+
+            <div id="mainContent" class="content main-content hidden">
+                <div class="video-stage" aria-hidden="true"></div>
+
+                <button id="openInvitationBtn" class="open-invitation-btn" type="button">
+                    Abrir invitaci&oacute;n
+                </button>
+
+                <div id="infoSheet" class="info-sheet">
+                    <header class="hero">
+                        <p class="eyebrow">S&aacute;bado 13 de junio de 2026</p>
+                        <div class="ornament" aria-hidden="true"></div>
+                        <h2 class="hero-title">Mis 15 A&ntilde;os</h2>
+                        <p class="hero-name">Natasha</p>
+                    </header>
+
+                    <section class="compact-details" aria-label="Detalles del evento">
+                        <article class="detail-pill">
+                            <span class="detail-label">Hora</span>
+                            <strong>22:00 hs</strong>
+                        </article>
+                        <article class="detail-pill">
+                            <span class="detail-label">Lugar</span>
+                            <strong>Sal&oacute;n Azul</strong>
+                        </article>
+                        <article class="detail-pill">
+                            <span class="detail-label">Vestimenta</span>
+                            <strong>Sport Formal. El color negro es exclusivo para la quincea&ntilde;era.</strong>
+                        </article>
+                    </section>
+
+                    <section class="countdown-section" aria-label="Cuenta regresiva">
+                        <p class="section-kicker">Faltan</p>
+                        <div class="countdown-timer">
+                            <div class="time-box"><span id="days">00</span><span>d&iacute;as</span></div>
+                            <div class="time-box"><span id="hours">00</span><span>horas</span></div>
+                            <div class="time-box"><span id="minutes">00</span><span>min</span></div>
+                            <div class="time-box"><span id="seconds">00</span><span>seg</span></div>
                         </div>
+                    </section>
+
+                    <section class="confirmation-panel">
+                        <div class="guest-pill">
+                            <span class="guest-label">Invitaci&oacute;n para</span>
+                            <div id="guestNameDisplay" class="guest-name">Cargando invitaci&oacute;n...</div>
+                            <input type="hidden" id="guestName" readonly>
+                        </div>
+
+                        <div class="confirmation-actions">
+                            <button id="confirmBtn" class="confirm-btn" disabled>Confirmar asistencia</button>
+                            <a href="https://maps.app.goo.gl/LX1qvkwKApb9qiAA6" target="_blank" rel="noopener noreferrer" class="secondary-btn">
+                                Ver ubicaci&oacute;n
+                            </a>
+                        </div>
+
+                        <p class="micro-note">Obsequios: Mi Dinero 3701052530</p>
                         <div id="message" class="message"></div>
-                    </div>
-                    <div class="bottom-two-columns">
-                        <div class="column-left">
-                            <div class="vestimenta-box">
-                                <span class="info-icon">🌹</span>
-                                <div class="info-text"><span>Vestimenta negra Exclusiva para la 15añera</span></div>
-                            </div>
-                        </div>
-                        <div class="column-center">
-                            <div class="event-details-compact">
-                                <a href="https://maps.app.goo.gl/LX1qvkwKApb9qiAA6" target="_blank" class="map-btn-compact">🕷️Salón Azul J. Belloni 3342 📍VER UBICACIÓN🕷️</a>
-                            </div>
-                        </div>
-                        <div class="column-right">
-                            <div class="obsequios-box">
-                                <span class="info-icon">👑 🎁</span>
-                                <div class="info-text"><strong>Obsequios:</strong><span>cuenta mi dinero 3701052530</span></div>
-                            </div>
-                        </div>
-                    </div>
+                    </section>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
+
     <div class="music-control">
-        <button id="musicToggle" class="music-btn">🌙 ACTIVAR MÚSICA 🌙</button>
+        <button id="musicToggle" class="music-btn">Activar m&uacute;sica</button>
     </div>
+
     <audio id="bgMusic" loop>
         <source src="musica-natasha.mp3" type="audio/mpeg">
     </audio>
+
     <script src="script.js"></script>
 </body>
 </html>
