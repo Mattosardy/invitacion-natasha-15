@@ -250,6 +250,7 @@
     </div>
     <script>
         const STORAGE_KEY = 'listaInvitadosNatasha';
+        const API_URL = "https://script.google.com/macros/s/AKfycbxKkWGUocc-HDMrdEVdIEmDATJFhOut_fmpZJLXVFbVxEGw_nozvKXTPOtH5i2LNu7W/exec";
         let listaInvitados = [];
         const invitadosIniciales = [
             { nombre: "prueba_uno", telefono: "99999999", cantidad: 1, confirmado: false, fechaConfirmacion: null },
@@ -294,20 +295,56 @@
             { nombre: "Felipe_Guzman", telefono: "93500221", cantidad: 1, confirmado: false, fechaConfirmacion: null }
         ];
         function guardarListaLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(listaInvitados)); }
-        function cargarLista() {
+        async function cargarLista() {
             const guardada = localStorage.getItem(STORAGE_KEY);
             if (guardada) { listaInvitados = JSON.parse(guardada); actualizarTabla(); }
             else { listaInvitados = JSON.parse(JSON.stringify(invitadosIniciales)); guardarListaLocal(); actualizarTabla(); }
+            await sincronizarListaRemota();
+        }
+        function normalizarInvitadoRemoto(inv, local) {
+            const estado = String(inv.estado || "").toLowerCase();
+            return {
+                id: inv.id || local?.id || "",
+                nombre: inv.nombre || local?.nombre || "",
+                telefono: String(inv.telefono || local?.telefono || ""),
+                cantidad: Number(inv.cantidad || local?.cantidad || 1),
+                token: inv.token || local?.token || "",
+                confirmado: estado ? estado === "confirmado" : local?.confirmado === true,
+                fechaConfirmacion: inv.fecha_confirmacion || local?.fechaConfirmacion || null,
+                invitacionEnviada: local?.invitacionEnviada === true,
+                fechaEnvioInvitacion: local?.fechaEnvioInvitacion || null
+            };
+        }
+        async function sincronizarListaRemota() {
+            try {
+                const listaLocal = Array.isArray(listaInvitados) ? listaInvitados : [];
+                const response = await fetch(`${API_URL}?action=listar_invitados`);
+                const data = await response.json();
+                if (!data.ok || !Array.isArray(data.invitados)) return;
+                listaInvitados = data.invitados.map(inv => {
+                    const telefono = String(inv.telefono || "");
+                    const local = listaLocal.find(item => item.token === inv.token || String(item.telefono) === telefono);
+                    return normalizarInvitadoRemoto(inv, local);
+                });
+                guardarListaLocal();
+                actualizarTabla();
+            } catch (error) {
+                console.error("No se pudo sincronizar la lista remota:", error);
+            }
         }
         function enviarInvitacionPorWhatsApp(index) {
             const invitado = listaInvitados[index];
             if (!invitado) return;
-            if (invitado.invitacionEnviada) return;
+            if (invitado.confirmado || invitado.invitacionEnviada) return;
+            if (!invitado.token) {
+                alert("Este invitado no tiene token de invitacion.");
+                return;
+            }
             invitado.invitacionEnviada = true;
             invitado.fechaEnvioInvitacion = new Date().toISOString();
             guardarListaLocal();
             actualizarTabla();
-            const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${invitado.nombre}`;
+            const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?token=${encodeURIComponent(invitado.token)}`;
             const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0a${enlace}%0a%0a¡Te esperamos! 🎉`;
             window.open(`https://wa.me/${invitado.telefono}?text=${mensaje}`, '_blank');
         }
@@ -336,7 +373,7 @@
                         <tr>
                             <td class="${nombreClase}">${mostrarNombre} <span class="cantidad-badge">${inv.cantidad} pers</span></td>
                             <td>${inv.telefono || '-'}</td>
-                            <td><button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})" ${inv.invitacionEnviada ? 'disabled' : ''}>${inv.invitacionEnviada ? 'Enviada' : '📲 Invitar'}</button></td>
+                            <td><button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})" ${(inv.confirmado || inv.invitacionEnviada || !inv.token) ? 'disabled' : ''}>${inv.confirmado ? 'Confirmado' : inv.invitacionEnviada ? 'Enviada' : !inv.token ? 'Sin token' : '📲 Invitar'}</button></td>
                         </tr>
                     `;
                 }).join('');
@@ -374,6 +411,7 @@
             document.getElementById('exportBtn').addEventListener('click', exportarExcel);
             document.getElementById('resetBtn').addEventListener('click', restablecerLista);
             cargarLista();
+            setInterval(sincronizarListaRemota, 30000);
         });
     </script>
 </body>
