@@ -144,6 +144,15 @@
             transform: scale(1.02);
             box-shadow: 0 0 8px rgba(37,211,102,0.5);
         }
+        .send-invite-btn:disabled {
+            background: #607d68;
+            cursor: not-allowed;
+            opacity: 0.75;
+        }
+        .send-invite-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
         .export-btn {
             width: 100%;
             padding: 12px;
@@ -293,6 +302,11 @@
         function enviarInvitacionPorWhatsApp(index) {
             const invitado = listaInvitados[index];
             if (!invitado) return;
+            if (invitado.invitacionEnviada) return;
+            invitado.invitacionEnviada = true;
+            invitado.fechaEnvioInvitacion = new Date().toISOString();
+            guardarListaLocal();
+            actualizarTabla();
             const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?nombre=${invitado.nombre}`;
             const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0a${enlace}%0a%0a¡Te esperamos! 🎉`;
             window.open(`https://wa.me/${invitado.telefono}?text=${mensaje}`, '_blank');
@@ -322,7 +336,7 @@
                         <tr>
                             <td class="${nombreClase}">${mostrarNombre} <span class="cantidad-badge">${inv.cantidad} pers</span></td>
                             <td>${inv.telefono || '-'}</td>
-                            <td><button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})">📲 Invitar</button></td>
+                            <td><button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})" ${inv.invitacionEnviada ? 'disabled' : ''}>${inv.invitacionEnviada ? 'Enviada' : '📲 Invitar'}</button></td>
                         </tr>
                     `;
                 }).join('');
