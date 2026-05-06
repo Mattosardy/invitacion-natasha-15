@@ -315,6 +315,15 @@
                 fechaEnvioInvitacion: local?.fechaEnvioInvitacion || null
             };
         }
+        function normalizarTelefonoWhatsApp(telefono) {
+            let numero = String(telefono || "").replace(/\D/g, "");
+
+            if (numero.startsWith("00")) numero = numero.slice(2);
+            if (numero.startsWith("0") && numero.length === 9) numero = numero.slice(1);
+            if (numero.length === 8 && numero.startsWith("9")) numero = `598${numero}`;
+
+            return numero;
+        }
         async function sincronizarListaRemota() {
             try {
                 const listaLocal = Array.isArray(listaInvitados) ? listaInvitados : [];
@@ -335,9 +344,14 @@
         function enviarInvitacionPorWhatsApp(index) {
             const invitado = listaInvitados[index];
             if (!invitado) return;
-            if (invitado.confirmado || invitado.invitacionEnviada) return;
+            if (invitado.confirmado) return;
             if (!invitado.token) {
                 alert("Este invitado no tiene token de invitacion.");
+                return;
+            }
+            const telefonoWhatsApp = normalizarTelefonoWhatsApp(invitado.telefono);
+            if (!/^5989\d{7}$/.test(telefonoWhatsApp)) {
+                alert("El telefono no tiene un formato valido para WhatsApp Uruguay. Ejemplo: 98036490 o +59898036490.");
                 return;
             }
             invitado.invitacionEnviada = true;
@@ -346,7 +360,7 @@
             actualizarTabla();
             const enlace = `https://mattosardy.github.io/invitacion-natasha-15/?token=${encodeURIComponent(invitado.token)}`;
             const mensaje = `🎸 *INVITACIÓN 15 AÑOS - NATASHA* 🎸%0a%0a¡Hola ${invitado.nombre}!%0a%0a📅 *Fecha:* Sábado 13 de Junio 2026%0a🕗 *Hora:* 22:00 a 05:00%0a📍 *Lugar:* Nuevo Salón Azul, José Belloni 3342%0a👗 *Código:* Vestimenta negra (exclusiva para la quinceañera)%0a%0a🔗 *Confirmá tu asistencia acá:*%0a${enlace}%0a%0a¡Te esperamos! 🎉`;
-            window.open(`https://wa.me/${invitado.telefono}?text=${mensaje}`, '_blank');
+            window.open(`https://wa.me/${telefonoWhatsApp}?text=${mensaje}`, '_blank');
         }
         function agregarInvitado() {
             const nombre = document.getElementById('newNombre').value.trim();
@@ -373,7 +387,7 @@
                         <tr>
                             <td class="${nombreClase}">${mostrarNombre} <span class="cantidad-badge">${inv.cantidad} pers</span></td>
                             <td>${inv.telefono || '-'}</td>
-                            <td><button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})" ${(inv.confirmado || inv.invitacionEnviada || !inv.token) ? 'disabled' : ''}>${inv.confirmado ? 'Confirmado' : inv.invitacionEnviada ? 'Enviada' : !inv.token ? 'Sin token' : '📲 Invitar'}</button></td>
+                            <td><button class="send-invite-btn" onclick="enviarInvitacionPorWhatsApp(${originalIndex})" ${(inv.confirmado || !inv.token) ? 'disabled' : ''}>${inv.confirmado ? 'Confirmado' : !inv.token ? 'Sin token' : inv.invitacionEnviada ? 'Reenviar' : '📲 Invitar'}</button></td>
                         </tr>
                     `;
                 }).join('');
